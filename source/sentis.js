@@ -1,6 +1,7 @@
 
 // Experimental
 
+import { ByteBuffer } from './byte-buffer.js';
 import { SentisFlatBuffer } from './sentis-schema.mjs';
 
 const sentis = {};
@@ -11,6 +12,9 @@ sentis.ModelFactory = class {
 
         // Early return if the stream is invalid or too short
         if (!stream || stream.length <= 12) {
+            /* eslint-disable no-console */
+            console.error('Stream is invalid or too short.');
+            /* eslint-enable no-console */
             return;
         }
 
@@ -18,14 +22,17 @@ sentis.ModelFactory = class {
 
         // Check for the "STU1" identifier
         const identifier = String.fromCharCode(...buffer.slice(4, 8));
-        if (identifier !== "STU1") {
-            return;
+
+        if (identifier !== 'STU1') {
+            /* eslint-disable no-console */
+            console.error(`Identifier ${identifier} does not match "STU1".`);
+            /* eslint-enable no-console */
+            // return;
         }
 
         // Read the root offset (first 4 bytes, little-endian)
         const rootOffset = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
 
-        // Ensure the root offset is valid (within file bounds)
         if (rootOffset >= stream.length) {
             return;
         }
@@ -37,7 +44,8 @@ sentis.ModelFactory = class {
     async open(context) {
         const metadata = sentis.Metadata.open();
         const reader = context.read('binary');
-        const program = new SentisFlatBuffer.Program.getRootAsProgram(reader);
+        const bb = new ByteBuffer(reader);
+        const program = SentisFlatBuffer.Program.getRootAsProgram(bb);
         return new sentis.Model(metadata, program);
     }
 };
@@ -47,13 +55,14 @@ sentis.Model = class {
         this.metadata = metadata || {};
         this.program = program;
         this.format = `Sentis v${program.version}`;
-        this.graphs = [new sentis.Graph(metadata, program.execution_plan)];
+        this.graphs = [new sentis.Graph(metadata, program.executionPlan)];
     }
 };
 
 sentis.Graph = class {
     constructor(metadata, executionPlan) {
         this.name = executionPlan.name();
+        this.name = executionPlan.name || '';
         this.inputs = [];
         this.outputs = [];
         this.nodes = [];
@@ -307,76 +316,6 @@ sentis.Activation = {
     200: "Acos", 201: "Acosh", 202: "Asin", 203: "Asinh", 204: "Atan", 205: "Atanh", 206: "Cos", 207: "Cosh", 208: "Sin", 209: "Sinh", 210: "Tan"
 };
 
-sentis.BinaryReader = class {
-
-    constructor(reader) {
-        this._reader = reader;
-    }
-
-    get position() {
-        return this._reader.position;
-    }
-
-    seek(position) {
-        this._reader.seek(position);
-    }
-
-    skip(offset) {
-        this._reader.skip(offset);
-    }
-
-    read(length) {
-        return this._reader.read(length);
-    }
-
-    byte() {
-        return this._reader.byte();
-    }
-
-    int32() {
-        return this._reader.int32();
-    }
-
-    int32s() {
-        const values = new Array(this.int32());
-        for (let i = 0; i < values.length; i++) {
-            values[i] = this.int32();
-        }
-        return values;
-    }
-
-    int64() {
-        return this._reader.int64();
-    }
-
-    float32() {
-        return this._reader.float32();
-    }
-
-    string() {
-        let content = '';
-        const size = this.int32();
-        for (let i = 0; i < size; i++) {
-            const c = this.byte();
-            content += String.fromCharCode(c);
-        }
-        return content;
-    }
-
-    strings() {
-        const values = [];
-        const length = this.int32();
-        for (let i = 0; i < length; i++) {
-            values.push(this.string());
-        }
-        return values;
-    }
-
-    shape() {
-        return this.int32s();
-    }
-};
-
 sentis.Metadata = class {
 
     static open() {
@@ -409,7 +348,7 @@ sentis.Metadata = class {
     type(id) {
         if (!this._types.has(id)) {
             // If the type is not registered, add it with a generic structure
-            this._types.set(id, { name: id.toString() });
+            this._types.set(id, { name: id?.toString() || "no-name" });
         }
         return this._types.get(id);
     }
