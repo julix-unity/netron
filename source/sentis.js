@@ -54,30 +54,43 @@ sentis.Model = class {
     constructor(metadata, program) {
         this.metadata = metadata || {};
         this.program = program;
-        this.format = `Sentis v${program.version}`;
-        this.graphs = [new sentis.Graph(metadata, program.executionPlan)];
+        this.format = `Sentis v${program.version()}`;
+        this.graphs = [new sentis.Graph(metadata, program)];
     }
 };
 
 sentis.Graph = class {
-    constructor(metadata, executionPlan) {
-        this.name = executionPlan.name();
-        this.name = executionPlan.name || '';
+    constructor(metadata, program) {
+        // const executionPlan = program.executionPlan(program);
+        // if (!executionPlan) {
+        //     console.error("panic, no execution plan");
+        // }
+        const executionPlan = program; // not really, should be closer to program.executionPlan() but not sure yet.
+        console.log(`
+            Program Plan: ${program.name}
+            ----
+            Graph Construction:
+            Inputs Length: ${program.inputsLength}
+            Outputs Length: ${program.outputsLength}
+            Chains Length: ${program.chainsLength}
+        `, program);
+        // Graph properties
+        this.name = program.name || '';
         this.inputs = [];
         this.outputs = [];
         this.nodes = [];
 
-        for (let i = 0; i < executionPlan.inputsLength(); i++) {
+        for (let i = 0; i < executionPlan.inputsLength; i++) {
             const input = executionPlan.inputs(i);
             this.inputs.push(new sentis.Argument(`input_${i}`, [input]));
         }
 
-        for (let i = 0; i < executionPlan.outputsLength(); i++) {
-            const output = executionPlan.outputs(i);
+        for (let i = 0; i < executionPlan.outputsLength; i++) {
+            const output = program.outputs(i);
             this.outputs.push(new sentis.Argument(`output_${i}`, [output]));
         }
 
-        for (let i = 0; i < executionPlan.chainsLength(); i++) {
+        for (let i = 0; i < executionPlan.chainsLength; i++) {
             const chain = executionPlan.chains(i);
             this.nodes.push(new sentis.Node(metadata, chain));
         }
