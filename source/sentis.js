@@ -1,6 +1,8 @@
 
 // Experimental
 
+import { SentisFlatBuffer } from './sentis-schema.mjs';
+
 const sentis = {};
 
 sentis.ModelFactory = class {
@@ -35,7 +37,7 @@ sentis.ModelFactory = class {
     async open(context) {
         const metadata = sentis.Metadata.open();
         const reader = context.read('binary');
-        const program = new sentis.Program(reader);
+        const program = new SentisFlatBuffer.Program.getRootAsProgram(reader);
         return new sentis.Model(metadata, program);
     }
 };
@@ -44,56 +46,31 @@ sentis.Model = class {
     constructor(metadata, program) {
         this.metadata = metadata || {};
         this.program = program;
-
-        // Set a format string for display
         this.format = `Sentis v${program.version}`;
-
-        // Extract and store graphs (e.g., execution plans)
         this.graphs = [new sentis.Graph(metadata, program.execution_plan)];
     }
 };
 
 sentis.Graph = class {
-    constructor(metadata, program) {
-        // Graph properties
-        this.name = program.execution_plan.name || '';
+    constructor(metadata, executionPlan) {
+        this.name = executionPlan.name();
         this.inputs = [];
         this.outputs = [];
-        this.nodes = []; // List of computational nodes.
+        this.nodes = [];
 
-        // A map to manage values, ensuring uniqueness
-        const values = new Map();
-        values.map = (name, type, initializer) => {
-            if (!values.has(name)) {
-                values.set(name, new sentis.Value(name, type, initializer));
-            }
-            return values.get(name);
-        };
-
-        const executionPlan = program.execution_plan;
-
-        // Handle inputs from the execution plan
-        for (let i = 0; i < executionPlan.inputs.length; i++) {
-            const inputId = executionPlan.inputs[i];
-            const inputName = executionPlan.inputs_name[i];
-            const eValue = executionPlan.values[inputId];
-            const argument = new sentis.Argument(inputName, [values.map(inputName, eValue.val)]);
-            this.inputs.push(argument);
+        for (let i = 0; i < executionPlan.inputsLength(); i++) {
+            const input = executionPlan.inputs(i);
+            this.inputs.push(new sentis.Argument(`input_${i}`, [input]));
         }
 
-        // Handle outputs from the execution plan
-        for (let i = 0; i < executionPlan.outputs.length; i++) {
-            const outputId = executionPlan.outputs[i];
-            const outputName = executionPlan.outputs_name[i];
-            const eValue = executionPlan.values[outputId];
-            const argument = new sentis.Argument(outputName, [values.map(outputName, eValue.val)]);
-            this.outputs.push(argument);
+        for (let i = 0; i < executionPlan.outputsLength(); i++) {
+            const output = executionPlan.outputs(i);
+            this.outputs.push(new sentis.Argument(`output_${i}`, [output]));
         }
 
-        // Handle nodes (chains of instructions)
-        for (const chain of executionPlan.chains) {
-            const node = new sentis.Node(metadata, chain, executionPlan.values, values);
-            this.nodes.push(node);
+        for (let i = 0; i < executionPlan.chainsLength(); i++) {
+            const chain = executionPlan.chains(i);
+            this.nodes.push(new sentis.Node(metadata, chain));
         }
     }
 };
