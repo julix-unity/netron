@@ -5788,6 +5788,7 @@ view.ModelFactoryService = class {
         this.register('./tengine', ['.tmfile']);
         this.register('./mslite', ['.ms', '.bin']);
         this.register('./barracuda', ['.nn']);
+        this.register('./sentis', ['.sentis']);
         this.register('./circle', ['.circle']);
         this.register('./dnn', ['.dnn']);
         this.register('./xmodel', ['.xmodel']);
