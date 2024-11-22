@@ -1,16 +1,26 @@
 
 // Experimental
 
-const logError = (...args) => {
+import { ByteBuffer } from './sentis-byte-buffer.js';
+import { SentisFlatBuffer } from './sentis-schema.mjs';
+import { parseKernel } from './sentis-kernel-metadata.js';
+const { Program, Operator, KernelCall, Tensor, EValue, EDim, Int, Byte, InstructionArguments, KernelTypes } = SentisFlatBuffer;
+
+export const logError = (...args) => {
     /* eslint-disable no-console */
     console.error(...args);
     /* eslint-enable no-console */
 };
-
-import { ByteBuffer } from './byte-buffer.js';
-import { SentisFlatBuffer } from './sentis-schema.mjs';
-
-const { Program, Operator, KernelCall, InstructionArguments } = SentisFlatBuffer;
+export const logInfo = (...args) => {
+    /* eslint-disable no-console */
+    console.info(...args);
+    /* eslint-enable no-console */
+};
+export const logWarning = (...args) => {
+    /* eslint-disable no-console */
+    console.warn(...args);
+    /* eslint-enable no-console */
+};
 
 const debugExecutionPlan = (executionPlan) => {
     const optionalEncoding = undefined;
@@ -155,19 +165,11 @@ sentis.Argument = class {
     }
 };
 
-sentis.Value = class {
-    constructor(name, type = null, initializer = null) {
-        this.name = name;
-        this.type = type;
-        this.initializer = initializer;
-    }
-};
-
 sentis.Node = class {
     constructor(metadata, chain, executionPlan) {
-        this.type = metadata.type ? metadata.type(chain.type) : { name: chain.type || 'Unknown' };
-        this.inputs = processIO(chain, chain.inputsLength, chain.inputs, 'input');
-        this.outputs = processIO(chain, chain.outputsLength, chain.outputs, 'output');
+        this.type = { name: "Unknown" }; // Placeholder type
+        this.inputs = processIO(chain, chain.inputsLength.bind(chain), chain.inputs.bind(chain), 'input');
+        this.outputs = processIO(chain, chain.outputsLength.bind(chain), chain.outputs.bind(chain), 'output');
         this.attributes = [];
 
         for (let i = 0; i < chain.instructionsLength(); i++) {
@@ -176,19 +178,20 @@ sentis.Node = class {
                 continue;
             }
 
-            const type = instruction.instrArgsType();
-            if (type === InstructionArguments.NONE) {
+            const instrType = instruction.instrArgsType();
+            if (instrType === InstructionArguments.NONE) {
                 this.attributes.push({ name: 'NoOp' });
                 continue;
             }
 
-            if (type !== InstructionArguments.KernelCall) {
-                this.attributes.push({ name: 'UnknownInstruction', type });
+            if (instrType !== InstructionArguments.KernelCall) {
+                this.attributes.push({ name: 'UnknownInstruction', type: instrType });
                 continue;
             }
 
-            const args = instruction.instrArgs(new KernelCall());
-            const opIndex = args.opIndex();
+            // Extract KernelCall arguments
+            const kernelCall = instruction.instrArgs(new KernelCall());
+            const opIndex = kernelCall.opIndex();
             const operator = executionPlan.operators(opIndex, new Operator());
 
             if (!operator) {
@@ -197,12 +200,23 @@ sentis.Node = class {
                 continue;
             }
 
-            const kernelName = operator?.name?.() ?? 'Unnamed Kernel';
-            this.attributes.push({ name: 'KernelCall', value: kernelName, opIndex, args: args.argsArray() });
-        }
+            const operatorName = operator.name();
 
+            // Update node type
+            this.type = { name: operatorName ?? 'Unnamed Kernel' };
+
+            // Use parseKernel to get attributes
+            const parsedAttributes = parseKernel(operatorName, kernelCall, chain, executionPlan);
+
+            if (parsedAttributes) {
+                this.attributes.push(...parsedAttributes);
+            } else {
+                logWarning(`Could not parse kernel: ${operatorName}`);
+            }
+        }
     }
 };
+
 
 sentis.Metadata = class {
 
