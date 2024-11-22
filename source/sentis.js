@@ -1,6 +1,12 @@
 
 // Experimental
 
+const logError = (...args) => {
+    /* eslint-disable no-console */
+    console.error(...args);
+    /* eslint-enable no-console */
+};
+
 import { ByteBuffer } from './byte-buffer.js';
 import { SentisFlatBuffer } from './sentis-schema.mjs';
 
@@ -51,19 +57,6 @@ Bellow the [object Object]s
     );
 };
 
-const debugGraph = (program, executionPlan) => {
-    console.log(`
-        Program 
-        Version: ${program.version?.()}
-        Identifier: ${program.bufferHasIdentifier?.()}
-        ----
-        Graph Construction:
-        Inputs Length: ${executionPlan.inputsLength?.()}
-        Outputs Length: ${executionPlan.outputsLength?.()}
-        Chains Length: ${executionPlan.chainsLength?.()}
-    `, program);
-}
-
 const sentis = {};
 
 const getInt32 = (buffer) => {
@@ -84,12 +77,10 @@ sentis.ModelFactory = class {
     match(context) {
         const stream = context.stream;
 
-        console.log(stream);
-
         // Early return if the stream is invalid or too short
         if (!stream || stream.length <= 12) {
             /* eslint-disable no-console */
-            console.error('Stream is invalid or too short.');
+            logError('Stream is invalid or too short.');
             /* eslint-enable no-console */
             return;
         }
@@ -115,12 +106,10 @@ sentis.ModelFactory = class {
         const rawBytes = new Uint8Array([...reader._buffer.slice(0, fileSize + 4)]);
         const bb = new ByteBuffer(rawBytes, 4);
 
-        console.log(reader, fileSize, rawBytes, bb);
-
         // Parse the program using FlatBuffers
         const program = Program.getRootAsProgram(bb);
         if (!program) {
-            console.error("No program!");
+            logError("No program!");
         }
 
         return new sentis.Model(metadata, program);
@@ -141,11 +130,9 @@ sentis.Graph = class {
         const executionPlan = program.executionPlan();
         debugExecutionPlan(executionPlan);
         if (!executionPlan) {
-            console.error("No execution plan!");
+            logError("No execution plan!");
             return;
         }
-
-        debugGraph(program, executionPlan);
 
         // Graph properties
         this.name = program.name || '';
@@ -205,7 +192,7 @@ sentis.Node = class {
             const operator = executionPlan.operators(opIndex, new Operator());
 
             if (!operator) {
-                console.error(`Missing operator for opIndex ${opIndex}`);
+                logError(`Missing operator for opIndex ${opIndex}`);
                 this.attributes.push({ name: 'KernelCall', value: 'Unknown Kernel', opIndex });
                 continue;
             }
