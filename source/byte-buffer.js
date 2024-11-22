@@ -16,9 +16,9 @@ export class ByteBuffer {
     /**
      * Create a new ByteBuffer with a given array of bytes (`Uint8Array`)
      */
-    constructor(bytes_) {
+    constructor(bytes_, position = 0) { // modified, original doesn't take a positon
         this.bytes_ = bytes_;
-        this.position_ = 0;
+        this.position_ = position;
         this.text_decoder_ = new TextDecoder();
     }
     /**
