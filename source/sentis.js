@@ -4,6 +4,8 @@
 import { ByteBuffer } from './byte-buffer.js';
 import { SentisFlatBuffer } from './sentis-schema.mjs';
 
+const { Program, Operator, KernelCall, InstructionArguments } = SentisFlatBuffer;
+
 const debugExecutionPlan = (executionPlan) => {
     const optionalEncoding = undefined;
     const index = 0;
@@ -67,6 +69,17 @@ const sentis = {};
 const getInt32 = (buffer) => {
     return buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
 };
+
+function processIO(context, lengthFunc, accessorFunc, type = 'input') {
+    const result = [];
+    for (let i = 0; i < lengthFunc.call(context); i++) {
+        const index = accessorFunc.call(context, i);
+        if (index !== null) {
+            result.push(new sentis.Argument(`${type}_${index}`, [index]));
+        }
+    }
+    return result;
+}
 sentis.ModelFactory = class {
     match(context) {
         const stream = context.stream;
@@ -105,7 +118,7 @@ sentis.ModelFactory = class {
         console.log(reader, fileSize, rawBytes, bb);
 
         // Parse the program using FlatBuffers
-        const program = SentisFlatBuffer.Program.getRootAsProgram(bb);
+        const program = Program.getRootAsProgram(bb);
         if (!program) {
             console.error("No program!");
         }
@@ -136,28 +149,13 @@ sentis.Graph = class {
 
         // Graph properties
         this.name = program.name || '';
-        this.inputs = [];
-        this.outputs = [];
+        this.inputs = processIO(executionPlan, executionPlan.inputsLength, executionPlan.inputs, 'input');
+        this.outputs = processIO(executionPlan, executionPlan.outputsLength, executionPlan.outputs, 'output');
         this.nodes = [];
-
-        for (let i = 0; i < executionPlan.inputsLength?.(); i++) {
-            const input = executionPlan?.inputs(i);
-            this.inputs.push(new sentis.Argument(`input_${i}`, [input]));
-        }
-
-        for (let i = 0; i < executionPlan.outputsLength?.(); i++) {
-            const output = executionPlan.outputs?.(i);
-            this.outputs.push(new sentis.Argument(`output_${i}`, [output]));
-        }
 
         for (let i = 0; i < executionPlan.chainsLength?.(); i++) {
             const chain = executionPlan.chains?.(i);
-            this.nodes.push(new sentis.Node(metadata, chain));
-
-            const isFirstOrLast = (i === 0 || i === executionPlan.chainsLength?.() - 1)
-            if (isFirstOrLast) {
-                console.log(chain);
-            }
+            this.nodes.push(new sentis.Node(metadata, chain, executionPlan, executionPlan.operators));
         }
     }
 };
@@ -179,82 +177,43 @@ sentis.Value = class {
 };
 
 sentis.Node = class {
-    constructor(metadata, chain, /*values, valueMap,*/ executionPlan) {
+    constructor(metadata, chain, executionPlan) {
         this.type = metadata.type ? metadata.type(chain.type) : { name: chain.type || 'Unknown' };
-        this.inputs = [];
-        this.outputs = [];
+        this.inputs = processIO(chain, chain.inputsLength, chain.inputs, 'input');
+        this.outputs = processIO(chain, chain.outputsLength, chain.outputs, 'output');
         this.attributes = [];
 
-        
+        for (let i = 0; i < chain.instructionsLength(); i++) {
+            const instruction = chain.instructions(i);
+            if (!instruction) {
+                continue;
+            }
 
-        // where do we get Builder from?
-        //   static addInstrArgsType(builder:flatbuffers.Builder, instrArgsType:InstructionArguments) {
-        //     builder.addFieldInt8(0, instrArgsType, InstructionArguments.NONE);
-        //   }
-          
-        //   static addInstrArgs(builder:flatbuffers.Builder, instrArgsOffset:flatbuffers.Offset) {
-        //     builder.addFieldOffset(1, instrArgsOffset, 0);
-        //   }
+            const type = instruction.instrArgsType();
+            if (type === InstructionArguments.NONE) {
+                this.attributes.push({ name: 'NoOp' });
+                continue;
+            }
 
-        console.log(
-            'Chain Instructions',
-            // chain.instructions(0).instrArgs(executionPlan),
-            // chain.instructions(0).instrArgsType(executionPlan)
-        );
+            if (type !== InstructionArguments.KernelCall) {
+                this.attributes.push({ name: 'UnknownInstruction', type });
+                continue;
+            }
 
-        for (let j = 0; j < chain.inputsLength?.(); j++) {
-            const inputIndex = chain.inputs?.(j);
-            this.inputs.push(inputIndex);
+            const args = instruction.instrArgs(new KernelCall());
+            const opIndex = args.opIndex();
+            const operator = executionPlan.operators(opIndex, new Operator());
 
+            if (!operator) {
+                console.error(`Missing operator for opIndex ${opIndex}`);
+                this.attributes.push({ name: 'KernelCall', value: 'Unknown Kernel', opIndex });
+                continue;
+            }
 
-            // if (chain.Instructions(0).Value.InstrArgsType == SentisFlatBuffer.InstructionArguments.NONE) {
-            //     continue;
-            // }
-
-            // const kernel = chain.instructions(0).Value.InstrArgsAsKernelCall();
-            // const kernelName = executionPlan.Operators(kernel.OpIndex).Value.Name;
-            // console.log("kernel", kernel, kernelName);
+            const kernelName = operator?.name?.() ?? 'Unnamed Kernel';
+            this.attributes.push({ name: 'KernelCall', value: kernelName, opIndex, args: args.argsArray() });
         }
 
-        // this.type = chain.instructions?.(0).instrArgsType() || "";
-        // console.log(this.type);
-
-        // // Map inputs from the chain
-        // if (chain.inputs?.()) {
-        //     for (let i = 0; i < chain.inputs?.length; i++) {
-        //         const inputId = chain.inputs[i];
-        //         const inputValue = values[inputId];
-        //         const argument = new sentis.Argument(`input_${i}`, [valueMap.map(inputValue.name, inputValue.val)]);
-        //         this.inputs.push(argument);
-        //     }
-        // }
-
-        // // Map outputs from the chain
-        // if (chain.outputs?.()) {
-        //     for (let i = 0; i < chain.outputs?.length; i++) {
-        //         const outputId = chain.outputs[i];
-        //         const outputValue = values[outputId];
-        //         const argument = new sentis.Argument(`output_${i}`, [valueMap.map(outputValue.name, outputValue.val)]);
-        //         this.outputs.push(argument);
-        //     }
-        // }
-
-        // // Process chain instructions as attributes
-        // if (chain.instructions()) {
-        //     for (const instruction of chain.instructions()) {
-        //         if (instruction.instr_args && instruction.instr_args.op_index !== undefined) {
-        //             const operator = metadata.operators
-        //                 ? metadata.operators[instruction.instr_args.op_index]
-        //                 : { name: `op_${instruction.instr_args.op_index}` };
-
-        //             const attribute = new sentis.Argument(
-        //                 operator.name,
-        //                 instruction.instr_args.args.map((argId) => valueMap.map(values[argId].name, values[argId].val))
-        //             );
-        //             this.attributes.push(attribute);
-        //         }
-        //     }
-        // }
     }
 };
 
