@@ -2,8 +2,8 @@
 // Experimental
 
 import { ByteBuffer } from './sentis-byte-buffer.js';
+import { KernelMetadata } from './sentis-kernel-metadata.js';
 import { SentisFlatBuffer } from './sentis-schema.mjs';
-import { parseKernel } from './sentis-kernel-metadata.js';
 const { Program, Operator, KernelCall, Tensor, EValue, EDim, Int, Byte, InstructionArguments, KernelTypes } = SentisFlatBuffer;
 
 export const logError = (...args) => {
@@ -73,6 +73,70 @@ const getInt32 = (buffer) => {
     return buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
 };
 
+const extractValueByType = (value, type) => {
+    const valType = value.valType();
+    const expectedValType = KernelTypes[type];
+    if (valType !== expectedValType) {
+        logWarning(`Type mismatch: Expected ${type}, but got ${KernelTypes[valType]}`);
+        return null;
+    }
+    const val = value.val(new SentisFlatBuffer[type]()); // Get the actual value object based on the type
+    switch (type) {
+        case 'Int':
+            return val.intVal();
+        case 'Bool':
+            return val.boolVal();
+        case 'Float':
+            return val.floatVal();
+        case 'IntList':
+            return val.itemsArray();
+        case 'FloatList':
+            return val.itemsArray();
+        case 'BoolList':
+            // Since BoolList stores booleans as Int8Array, convert to array of booleans
+            return Array.from(val.itemsArray()).map((item) => Boolean(item));
+        case 'String':
+            return val.stringVal();
+        default:
+            logWarning(`Unsupported type: ${type}`);
+            return null;
+    }
+};
+
+const parseKernel = (operatorName, kernelCall, chain, executionPlan) => {
+    const metadata = KernelMetadata[operatorName];
+    if (!metadata) {
+        logWarning(`Unsupported kernel: ${operatorName}`);
+        return undefined;
+    }
+
+    const attributes = [];
+
+    // Process inputs
+    metadata.inputs.forEach(({ index, name, required }) => {
+        const inputIndex = required ? chain.inputs(index) : chain.inputs(index);
+        if (inputIndex !== undefined && inputIndex !== null) {
+            attributes.push({ name, value: `Input ${inputIndex}` });
+        } else if (required) {
+            logError(`Missing required input: ${name}`);
+        }
+    });
+
+    // Process arguments
+    metadata.args.forEach(({ index, name, type }) => {
+        const argIndex = kernelCall.args(index);
+        const value = executionPlan.values(argIndex, new EValue());
+        if (value) {
+            const argValue = extractValueByType(value, type);
+            attributes.push({ name, value: argValue });
+        } else {
+            logWarning(`Missing argument: ${name}`);
+        }
+    });
+
+    return attributes;
+};
+
 function processIO(context, lengthFunc, accessorFunc, type = 'input') {
     const result = [];
     for (let i = 0; i < lengthFunc.call(context); i++) {
@@ -83,6 +147,7 @@ function processIO(context, lengthFunc, accessorFunc, type = 'input') {
     }
     return result;
 }
+
 sentis.ModelFactory = class {
     match(context) {
         const stream = context.stream;
@@ -216,7 +281,6 @@ sentis.Node = class {
         }
     }
 };
-
 
 sentis.Metadata = class {
 
