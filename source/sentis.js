@@ -137,7 +137,19 @@ const parseKernel = (operatorName, kernelCall, chain, executionPlan) => {
     return attributes;
 };
 
-function processIO(context, lengthFunc, accessorFunc, type = 'input') {
+function processIO(executionPlan, type = 'input', chain = null) {
+
+    const context = chain || executionPlan;
+    const lengthFuncName = `${type}sLength`;
+    const accessorFuncName = `${type}s`;
+
+    if (typeof context[lengthFuncName] !== 'function' || typeof context[accessorFuncName] !== 'function') {
+        throw new Error(`In processIO - Invalid context: Missing methods '${lengthFuncName}' or '${accessorFuncName}'.`);
+    }
+
+    const lengthFunc = context[lengthFuncName].bind(context);
+    const accessorFunc = context[accessorFuncName].bind(context);
+
     const result = [];
     for (let i = 0; i < lengthFunc.call(context); i++) {
         const index = accessorFunc.call(context, i);
@@ -159,12 +171,6 @@ sentis.ModelFactory = class {
             /* eslint-enable no-console */
             return;
         }
-        // const buffer = stream.peek(4);
-        // // Read the root offset (first 4 bytes, little-endian)
-        // const rootOffset = getInt32(buffer)
-        // if (rootOffset >= stream?.length) {
-        //     return;
-        // }
 
         // Set the context type
         context.type = "sentis";
@@ -211,8 +217,8 @@ sentis.Graph = class {
 
         // Graph properties
         this.name = program.name || '';
-        this.inputs = processIO(executionPlan, executionPlan.inputsLength, executionPlan.inputs, 'input');
-        this.outputs = processIO(executionPlan, executionPlan.outputsLength, executionPlan.outputs, 'output');
+        this.inputs = processIO(executionPlan, 'input');
+        this.outputs = processIO(executionPlan, 'output');
         this.nodes = [];
 
         for (let i = 0; i < executionPlan.chainsLength?.(); i++) {
@@ -233,8 +239,8 @@ sentis.Argument = class {
 sentis.Node = class {
     constructor(metadata, chain, executionPlan) {
         this.type = { name: "Unknown" }; // Placeholder type
-        this.inputs = processIO(chain, chain.inputsLength.bind(chain), chain.inputs.bind(chain), 'input');
-        this.outputs = processIO(chain, chain.outputsLength.bind(chain), chain.outputs.bind(chain), 'output');
+        this.inputs = processIO(executionPlan, 'input', chain);
+        this.outputs = processIO(executionPlan, 'output', chain);
         this.attributes = [];
 
         for (let i = 0; i < chain.instructionsLength(); i++) {
