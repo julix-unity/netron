@@ -1,8 +1,4 @@
-import { logError, logInfo, logWarning } from "./sentis.js";
-import { SentisFlatBuffer } from './sentis-schema.mjs';
-const { KernelTypes, EValue } = SentisFlatBuffer;
-
-const KernelMetadata = {
+export const KernelMetadata = {
     Reshape: {
         inputs: [
             { index: 0, name: "input", required: true },
@@ -1332,70 +1328,14 @@ const KernelMetadata = {
             { index: 1, name: "zeroPoint", type: "Int" },
         ],
     },
-};
-
-export const extractValueByType = (value, type) => {
-    console.log(value, type);
-    const valType = value.valType();
-    const expectedValType = KernelTypes[type];
-    if (valType !== expectedValType) {
-        logWarning(`Type mismatch: Expected ${type}, but got ${KernelTypes[valType]}`);
-        return null;
+    Gemm: { // was missing...
+        inputs: [
+            { index: 0, name: "input", require: true },
+            { index: 1, name: "bias" },
+            { index: 2, name: "C" }, // count?
+            { index: 3, name: "transposeB" }
+        ],
+        outputs: [], // no idea
+        args: [] // no idea
     }
-    const val = value.val(new SentisFlatBuffer[type]()); // Get the actual value object based on the type
-    console.log(valType, val);
-    switch (type) {
-        case 'Int':
-            return val.intVal();
-        case 'Bool':
-            return val.boolVal();
-        case 'Float':
-            return val.floatVal();
-        case 'IntList':
-            return val.itemsArray();
-        case 'FloatList':
-            return val.itemsArray();
-        case 'BoolList':
-            // Since BoolList stores booleans as Int8Array, convert to array of booleans
-            return Array.from(val.itemsArray()).map((item) => Boolean(item));
-        case 'String':
-            return val.stringVal();
-        default:
-            logWarning(`Unsupported type: ${type}`);
-            return null;
-    }
-};
-
-export const parseKernel = (operatorName, kernelCall, chain, executionPlan) => {
-    const metadata = KernelMetadata[operatorName];
-    if (!metadata) {
-        logWarning(`Unsupported kernel: ${operatorName}`);
-        return undefined;
-    }
-
-    const attributes = [];
-
-    // Process inputs
-    metadata.inputs.forEach(({ index, name, required }) => {
-        const inputIndex = required ? chain.inputs(index) : chain.inputs(index);
-        if (inputIndex !== undefined && inputIndex !== null) {
-            attributes.push({ name, value: `Input ${inputIndex}` });
-        } else if (required) {
-            logError(`Missing required input: ${name}`);
-        }
-    });
-
-    // Process arguments
-    metadata.args.forEach(({ index, name, type }) => {
-        const argIndex = kernelCall.args(index);
-        const value = executionPlan.values(argIndex, new EValue());
-        if (value) {
-            const argValue = extractValueByType(value, type);
-            attributes.push({ name, value: argValue });
-        } else {
-            logWarning(`Missing argument: ${name}`);
-        }
-    });
-
-    return attributes;
 };
