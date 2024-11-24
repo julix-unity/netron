@@ -140,22 +140,33 @@ const parseKernel = (operatorName, kernelCall, chain, executionPlan) => {
 function processIO(executionPlan, type = 'input', chain = null) {
 
     const context = chain || executionPlan;
-    const lengthFuncName = `${type}sLength`;
     const accessorFuncName = `${type}s`;
+    const lengthFuncName = `${type}sLength`;
+    const nameFuncName = `${type}sName`;
 
-    if (typeof context[lengthFuncName] !== 'function' || typeof context[accessorFuncName] !== 'function') {
-        throw new Error(`In processIO - Invalid context: Missing methods '${lengthFuncName}' or '${accessorFuncName}'.`);
+    if (
+        typeof context[lengthFuncName] !== 'function' ||
+        typeof context[accessorFuncName] !== 'function' ||
+        typeof executionPlan[nameFuncName] !== 'function'
+    ) {
+        throw new Error(`Invalid context: Missing methods '${lengthFuncName}', '${accessorFuncName}', or '${nameFuncName}'.`);
     }
 
     const lengthFunc = context[lengthFuncName].bind(context);
     const accessorFunc = context[accessorFuncName].bind(context);
 
+    const length = lengthFunc();
     const result = [];
-    for (let i = 0; i < lengthFunc.call(context); i++) {
-        const index = accessorFunc.call(context, i);
-        if (index !== null) {
-            result.push(new sentis.Argument(`${type}_${index}`, [index]));
-        }
+    for (let i = 0; i < length; i++) {
+        const index = accessorFunc(i);
+        const value = executionPlan.values(index, new EValue());
+        const valType = value?.valType();
+        const valTypeStr = KernelTypes[valType] || "Unknown";
+
+        const name = executionPlan[nameFuncName](i, new TextDecoder('utf-8'));
+        const readableLabel = name || `${type}_${valTypeStr}_${index}`;
+
+        result.push(new sentis.Argument(readableLabel, [index]));
     }
     return result;
 }
