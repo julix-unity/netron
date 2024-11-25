@@ -409,7 +409,7 @@ export const KernelMetadata = {
         ],
     },
     And: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Logic,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -430,7 +430,7 @@ export const KernelMetadata = {
         ],
     },
     Equal: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Logic,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -439,7 +439,7 @@ export const KernelMetadata = {
         args: [],
     },
     Greater: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Logic,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -448,7 +448,7 @@ export const KernelMetadata = {
         args: [],
     },
     GreaterOrEqual: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Logic,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -457,7 +457,7 @@ export const KernelMetadata = {
         args: [],
     },
     IsInf: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Logic,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -468,7 +468,7 @@ export const KernelMetadata = {
         ],
     },
     IsNaN: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Logic,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -476,7 +476,7 @@ export const KernelMetadata = {
         args: [],
     },
     Less: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Logic,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -485,7 +485,7 @@ export const KernelMetadata = {
         args: [],
     },
     LessOrEqual: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Logic,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -494,7 +494,7 @@ export const KernelMetadata = {
         args: [],
     },
     Not: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Logic,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -502,7 +502,7 @@ export const KernelMetadata = {
         args: [],
     },
     Or: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Logic,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -511,7 +511,7 @@ export const KernelMetadata = {
         args: [],
     },
     Xor: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Logic,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -530,7 +530,7 @@ export const KernelMetadata = {
         args: [],
     },
     Abs: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -538,7 +538,7 @@ export const KernelMetadata = {
         args: [],
     },
     Add: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -547,7 +547,7 @@ export const KernelMetadata = {
         args: [],
     },
     Ceil: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -555,7 +555,7 @@ export const KernelMetadata = {
         args: [],
     },
     Clip: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "min", required: false },
@@ -565,7 +565,7 @@ export const KernelMetadata = {
         args: [],
     },
     CumSum: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "axis", required: true },
@@ -601,7 +601,7 @@ export const KernelMetadata = {
         ],
     },
     Div: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -610,7 +610,7 @@ export const KernelMetadata = {
         args: [],
     },
     Einsum: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: "0..N-1", name: "inputs", required: true },
         ],
@@ -620,7 +620,7 @@ export const KernelMetadata = {
         ],
     },
     Exp: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -628,7 +628,7 @@ export const KernelMetadata = {
         args: [],
     },
     Floor: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -636,7 +636,7 @@ export const KernelMetadata = {
         args: [],
     },
     Log: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -665,7 +665,7 @@ export const KernelMetadata = {
         ],
     },
     Max: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -674,7 +674,7 @@ export const KernelMetadata = {
         args: [],
     },
     Min: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -683,7 +683,7 @@ export const KernelMetadata = {
         args: [],
     },
     Mod: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -694,7 +694,7 @@ export const KernelMetadata = {
         ],
     },
     Mul: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -703,7 +703,7 @@ export const KernelMetadata = {
         args: [],
     },
     Neg: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -711,7 +711,7 @@ export const KernelMetadata = {
         args: [],
     },
     Pow: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -720,7 +720,7 @@ export const KernelMetadata = {
         args: [],
     },
     Reciprocal: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -728,7 +728,7 @@ export const KernelMetadata = {
         args: [],
     },
     Round: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -736,7 +736,7 @@ export const KernelMetadata = {
         args: [],
     },
     ScalarMad: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -750,7 +750,7 @@ export const KernelMetadata = {
         ],
     },
     Shrink: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -761,7 +761,7 @@ export const KernelMetadata = {
         ],
     },
     Sign: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -769,7 +769,7 @@ export const KernelMetadata = {
         args: [],
     },
     Sqrt: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -777,7 +777,7 @@ export const KernelMetadata = {
         args: [],
     },
     Square: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -785,7 +785,7 @@ export const KernelMetadata = {
         args: [],
     },
     Sub: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -794,7 +794,7 @@ export const KernelMetadata = {
         args: [],
     },
     ScaleBias: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "scale", required: true },
@@ -914,7 +914,7 @@ export const KernelMetadata = {
         args: [],
     },
     RandomNormal: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Random,
         inputs: [],
         outputs: [],
         args: [
@@ -926,7 +926,7 @@ export const KernelMetadata = {
         ],
     },
     RandomNormalLike: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Random,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -939,7 +939,7 @@ export const KernelMetadata = {
         ],
     },
     RandomUniform: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Random,
         inputs: [],
         outputs: [],
         args: [
@@ -951,7 +951,7 @@ export const KernelMetadata = {
         ],
     },
     RandomUniformLike: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Random,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -964,7 +964,7 @@ export const KernelMetadata = {
         ],
     },
     Bernoulli: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Random,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -976,7 +976,7 @@ export const KernelMetadata = {
         ],
     },
     Multinomial: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Random,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1040,7 +1040,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceLogSum: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -1052,7 +1052,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceLogSumExp: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -1064,7 +1064,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceMax: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -1076,7 +1076,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceMean: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -1088,7 +1088,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceMin: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -1100,7 +1100,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceProd: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -1112,7 +1112,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceSum: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -1124,7 +1124,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceSumSquare: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -1353,7 +1353,7 @@ export const KernelMetadata = {
         ],
     },
     Trilu: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "k", required: false },
@@ -1373,7 +1373,7 @@ export const KernelMetadata = {
         args: [],
     },
     Acos: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1381,7 +1381,7 @@ export const KernelMetadata = {
         args: [],
     },
     Acosh: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1389,7 +1389,7 @@ export const KernelMetadata = {
         args: [],
     },
     Asin: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1397,7 +1397,7 @@ export const KernelMetadata = {
         args: [],
     },
     Asinh: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1405,7 +1405,7 @@ export const KernelMetadata = {
         args: [],
     },
     Atan: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1413,7 +1413,7 @@ export const KernelMetadata = {
         args: [],
     },
     Atanh: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1421,7 +1421,7 @@ export const KernelMetadata = {
         args: [],
     },
     Cos: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1429,7 +1429,7 @@ export const KernelMetadata = {
         args: [],
     },
     Cosh: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1437,7 +1437,7 @@ export const KernelMetadata = {
         args: [],
     },
     Sin: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1445,7 +1445,7 @@ export const KernelMetadata = {
         args: [],
     },
     Sinh: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1453,7 +1453,7 @@ export const KernelMetadata = {
         args: [],
     },
     Tan: {
-        category: NODE_CATEGORIES.Transform,
+        category: NODE_CATEGORIES.Math,
         inputs: [
             { index: 0, name: "input", required: true },
         ],

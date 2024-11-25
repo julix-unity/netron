@@ -1067,8 +1067,8 @@ export const NODE_CATEGORIES = Object.freeze({
     Attention: 'Attention', // Orange-blue-ish
     Custom: 'Custom', // Lighter-grey-ish
 
-    // things doesn't have it's own category, so uses transform
-    Math: 'Transform', // Add, Sub, Mul, Div
-    Logic: 'Transform', // And, Or, Xor, etc.
-    Random: 'Transform',
+    // things doesn't have it's own category
+    Math: 'Custom', // Add, Sub, Mul, Div
+    Logic: 'Custom', // And, Or, Xor, etc.
+    Random: 'Custom',
 });
