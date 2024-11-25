@@ -1,5 +1,8 @@
+import { NODE_CATEGORIES } from "./grapher.js";
+
 export const KernelMetadata = {
     Reshape: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "shape", required: true },
@@ -10,6 +13,7 @@ export const KernelMetadata = {
         ],
     },
     Conv: {
+        category: NODE_CATEGORIES.Layer,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "weights", required: true },
@@ -27,6 +31,7 @@ export const KernelMetadata = {
         ],
     },
     MaxPool: {
+        category: NODE_CATEGORIES.Pool,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -39,6 +44,7 @@ export const KernelMetadata = {
         ],
     },
     Celu: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -48,6 +54,7 @@ export const KernelMetadata = {
         ],
     },
     Elu: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -57,6 +64,7 @@ export const KernelMetadata = {
         ],
     },
     Gelu: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -64,6 +72,7 @@ export const KernelMetadata = {
         args: [],
     },
     GeluFast: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -71,6 +80,7 @@ export const KernelMetadata = {
         args: [],
     },
     Erf: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -78,6 +88,7 @@ export const KernelMetadata = {
         args: [],
     },
     Hardmax: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -87,6 +98,7 @@ export const KernelMetadata = {
         ],
     },
     HardSigmoid: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -97,6 +109,7 @@ export const KernelMetadata = {
         ],
     },
     HardSwish: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -104,6 +117,7 @@ export const KernelMetadata = {
         args: [],
     },
     LeakyRelu: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -113,6 +127,7 @@ export const KernelMetadata = {
         ],
     },
     PRelu: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "slope", required: true },
@@ -121,6 +136,7 @@ export const KernelMetadata = {
         args: [],
     },
     Relu: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -128,6 +144,7 @@ export const KernelMetadata = {
         args: [],
     },
     Relu6: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -135,6 +152,7 @@ export const KernelMetadata = {
         args: [],
     },
     Selu: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -145,6 +163,7 @@ export const KernelMetadata = {
         ],
     },
     Sigmoid: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -152,6 +171,7 @@ export const KernelMetadata = {
         args: [],
     },
     Softplus: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -159,6 +179,7 @@ export const KernelMetadata = {
         args: [],
     },
     Softsign: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -166,6 +187,7 @@ export const KernelMetadata = {
         args: [],
     },
     Swish: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -173,6 +195,7 @@ export const KernelMetadata = {
         args: [],
     },
     Tanh: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -180,6 +203,7 @@ export const KernelMetadata = {
         args: [],
     },
     ThresholdedRelu: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -189,6 +213,7 @@ export const KernelMetadata = {
         ],
     },
     LogSoftmax: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -198,6 +223,7 @@ export const KernelMetadata = {
         ],
     },
     Softmax: {
+        category: NODE_CATEGORIES.Activation,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -207,6 +233,7 @@ export const KernelMetadata = {
         ],
     },
     ConvTranspose: {
+        category: NODE_CATEGORIES.Layer,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "weights", required: true },
@@ -223,6 +250,7 @@ export const KernelMetadata = {
         ],
     },
     Shape: {
+        category: NODE_CATEGORIES.Shape,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -233,6 +261,7 @@ export const KernelMetadata = {
         ],
     },
     Size: {
+        category: NODE_CATEGORIES.Shape,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -240,6 +269,7 @@ export const KernelMetadata = {
         args: [],
     },
     ConstantOfShape: {
+        category: NODE_CATEGORIES.Shape,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -251,6 +281,7 @@ export const KernelMetadata = {
         ],
     },
     OneHot: {
+        category: NODE_CATEGORIES.Shape,
         inputs: [
             { index: 0, name: "indices", required: true },
             { index: 1, name: "depth", required: true },
@@ -262,6 +293,7 @@ export const KernelMetadata = {
         ],
     },
     Range: {
+        category: NODE_CATEGORIES.Shape,
         inputs: [
             { index: 0, name: "start", required: true },
             { index: 1, name: "limit", required: true },
@@ -271,6 +303,7 @@ export const KernelMetadata = {
         args: [],
     },
     ArgMax: {
+        category: NODE_CATEGORIES.Shape,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -282,6 +315,7 @@ export const KernelMetadata = {
         ],
     },
     ArgMin: {
+        category: NODE_CATEGORIES.Shape,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -293,6 +327,7 @@ export const KernelMetadata = {
         ],
     },
     Gather: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "indices", required: true },
@@ -303,6 +338,7 @@ export const KernelMetadata = {
         ],
     },
     GatherElements: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "indices", required: true },
@@ -313,6 +349,7 @@ export const KernelMetadata = {
         ],
     },
     GatherND: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "indices", required: true },
@@ -323,6 +360,7 @@ export const KernelMetadata = {
         ],
     },
     NonZero: {
+        category: NODE_CATEGORIES.Shape,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -330,6 +368,7 @@ export const KernelMetadata = {
         args: [],
     },
     ScatterElements: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "indices", required: true },
@@ -342,6 +381,7 @@ export const KernelMetadata = {
         ],
     },
     ScatterND: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "indices", required: true },
@@ -353,6 +393,7 @@ export const KernelMetadata = {
         ],
     },
     TopK: {
+        category: NODE_CATEGORIES.Shape,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "k", required: true },
@@ -368,6 +409,7 @@ export const KernelMetadata = {
         ],
     },
     And: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -376,6 +418,7 @@ export const KernelMetadata = {
         args: [],
     },
     Compress: {
+        category: NODE_CATEGORIES.Shape,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "conditions", required: true },
@@ -387,6 +430,7 @@ export const KernelMetadata = {
         ],
     },
     Equal: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -395,6 +439,7 @@ export const KernelMetadata = {
         args: [],
     },
     Greater: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -403,6 +448,7 @@ export const KernelMetadata = {
         args: [],
     },
     GreaterOrEqual: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -411,6 +457,7 @@ export const KernelMetadata = {
         args: [],
     },
     IsInf: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -421,6 +468,7 @@ export const KernelMetadata = {
         ],
     },
     IsNaN: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -428,6 +476,7 @@ export const KernelMetadata = {
         args: [],
     },
     Less: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -436,6 +485,7 @@ export const KernelMetadata = {
         args: [],
     },
     LessOrEqual: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -444,6 +494,7 @@ export const KernelMetadata = {
         args: [],
     },
     Not: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -451,6 +502,7 @@ export const KernelMetadata = {
         args: [],
     },
     Or: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -459,6 +511,7 @@ export const KernelMetadata = {
         args: [],
     },
     Xor: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -467,6 +520,7 @@ export const KernelMetadata = {
         args: [],
     },
     Where: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "condition", required: true },
             { index: 1, name: "x", required: true },
@@ -476,6 +530,7 @@ export const KernelMetadata = {
         args: [],
     },
     Abs: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -483,6 +538,7 @@ export const KernelMetadata = {
         args: [],
     },
     Add: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -491,6 +547,7 @@ export const KernelMetadata = {
         args: [],
     },
     Ceil: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -498,6 +555,7 @@ export const KernelMetadata = {
         args: [],
     },
     Clip: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "min", required: false },
@@ -507,6 +565,7 @@ export const KernelMetadata = {
         args: [],
     },
     CumSum: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "axis", required: true },
@@ -518,6 +577,7 @@ export const KernelMetadata = {
         ],
     },
     Dense: {
+        category: NODE_CATEGORIES.Layer,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "weights", required: true },
@@ -529,6 +589,7 @@ export const KernelMetadata = {
         ],
     },
     DenseBatched: {
+        category: NODE_CATEGORIES.Layer,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "weights", required: true },
@@ -540,6 +601,7 @@ export const KernelMetadata = {
         ],
     },
     Div: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -548,6 +610,7 @@ export const KernelMetadata = {
         args: [],
     },
     Einsum: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: "0..N-1", name: "inputs", required: true },
         ],
@@ -557,6 +620,7 @@ export const KernelMetadata = {
         ],
     },
     Exp: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -564,6 +628,7 @@ export const KernelMetadata = {
         args: [],
     },
     Floor: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -571,6 +636,7 @@ export const KernelMetadata = {
         args: [],
     },
     Log: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -578,6 +644,7 @@ export const KernelMetadata = {
         args: [],
     },
     MatMul: {
+        category: NODE_CATEGORIES.Layer,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -586,6 +653,7 @@ export const KernelMetadata = {
         args: [],
     },
     MatMul2D: {
+        category: NODE_CATEGORIES.Layer,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -597,6 +665,7 @@ export const KernelMetadata = {
         ],
     },
     Max: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -605,6 +674,7 @@ export const KernelMetadata = {
         args: [],
     },
     Min: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -613,6 +683,7 @@ export const KernelMetadata = {
         args: [],
     },
     Mod: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -623,6 +694,7 @@ export const KernelMetadata = {
         ],
     },
     Mul: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -631,6 +703,7 @@ export const KernelMetadata = {
         args: [],
     },
     Neg: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -638,6 +711,7 @@ export const KernelMetadata = {
         args: [],
     },
     Pow: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -646,6 +720,7 @@ export const KernelMetadata = {
         args: [],
     },
     Reciprocal: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -653,6 +728,7 @@ export const KernelMetadata = {
         args: [],
     },
     Round: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -660,6 +736,7 @@ export const KernelMetadata = {
         args: [],
     },
     ScalarMad: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -673,6 +750,7 @@ export const KernelMetadata = {
         ],
     },
     Shrink: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -683,6 +761,7 @@ export const KernelMetadata = {
         ],
     },
     Sign: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -690,6 +769,7 @@ export const KernelMetadata = {
         args: [],
     },
     Sqrt: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -697,6 +777,7 @@ export const KernelMetadata = {
         args: [],
     },
     Square: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -704,6 +785,7 @@ export const KernelMetadata = {
         args: [],
     },
     Sub: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "a", required: true },
             { index: 1, name: "b", required: true },
@@ -712,6 +794,7 @@ export const KernelMetadata = {
         args: [],
     },
     ScaleBias: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "scale", required: true },
@@ -721,6 +804,7 @@ export const KernelMetadata = {
         args: [],
     },
     InstanceNormalization: {
+        category: NODE_CATEGORIES.Normalization,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "scale", required: true },
@@ -732,6 +816,7 @@ export const KernelMetadata = {
         ],
     },
     LayerNormalization: {
+        category: NODE_CATEGORIES.Normalization,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "scale", required: true },
@@ -743,6 +828,7 @@ export const KernelMetadata = {
         ],
     },
     BatchNormalization: {
+        category: NODE_CATEGORIES.Normalization,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "scale", required: true },
@@ -756,6 +842,7 @@ export const KernelMetadata = {
         ],
     },
     LRN: {
+        category: NODE_CATEGORIES.Normalization,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -768,6 +855,7 @@ export const KernelMetadata = {
         ],
     },
     NonMaxSuppression: {
+        category: NODE_CATEGORIES.Shape,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "scores", required: true },
@@ -781,6 +869,7 @@ export const KernelMetadata = {
         ],
     },
     RoiAlign: {
+        category: NODE_CATEGORIES.Shape,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "rois", required: true },
@@ -796,6 +885,7 @@ export const KernelMetadata = {
         ],
     },
     AveragePool: {
+        category: NODE_CATEGORIES.Pool,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -808,6 +898,7 @@ export const KernelMetadata = {
         ],
     },
     GlobalAveragePool: {
+        category: NODE_CATEGORIES.Pool,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -815,6 +906,7 @@ export const KernelMetadata = {
         args: [],
     },
     GlobalMaxPool: {
+        category: NODE_CATEGORIES.Pool,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -822,6 +914,7 @@ export const KernelMetadata = {
         args: [],
     },
     RandomNormal: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [],
         outputs: [],
         args: [
@@ -833,6 +926,7 @@ export const KernelMetadata = {
         ],
     },
     RandomNormalLike: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -845,6 +939,7 @@ export const KernelMetadata = {
         ],
     },
     RandomUniform: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [],
         outputs: [],
         args: [
@@ -856,6 +951,7 @@ export const KernelMetadata = {
         ],
     },
     RandomUniformLike: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -868,6 +964,7 @@ export const KernelMetadata = {
         ],
     },
     Bernoulli: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -879,6 +976,7 @@ export const KernelMetadata = {
         ],
     },
     Multinomial: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -890,6 +988,7 @@ export const KernelMetadata = {
         ],
     },
     LSTM: {
+        category: NODE_CATEGORIES.Layer,
         inputs: [
             { index: 0, name: "X", required: true },
             { index: 1, name: "W", required: true },
@@ -917,6 +1016,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceL1: {
+        category: NODE_CATEGORIES.undefined,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -928,6 +1028,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceL2: {
+        category: NODE_CATEGORIES.undefined,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -939,6 +1040,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceLogSum: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -950,6 +1052,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceLogSumExp: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -961,6 +1064,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceMax: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -972,6 +1076,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceMean: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -983,6 +1088,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceMin: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -994,6 +1100,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceProd: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -1005,6 +1112,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceSum: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -1016,6 +1124,7 @@ export const KernelMetadata = {
         ],
     },
     ReduceSumSquare: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "axes", required: false },
@@ -1027,6 +1136,7 @@ export const KernelMetadata = {
         ],
     },
     Cast: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1036,6 +1146,7 @@ export const KernelMetadata = {
         ],
     },
     CastLike: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "targetType", required: true },
@@ -1044,6 +1155,7 @@ export const KernelMetadata = {
         args: [],
     },
     Concat: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: "0..N-1", name: "inputs", required: true },
         ],
@@ -1053,6 +1165,7 @@ export const KernelMetadata = {
         ],
     },
     DepthToSpace: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1063,6 +1176,7 @@ export const KernelMetadata = {
         ],
     },
     Expand: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "shape", required: true },
@@ -1071,6 +1185,7 @@ export const KernelMetadata = {
         args: [],
     },
     Flatten: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1080,6 +1195,7 @@ export const KernelMetadata = {
         ],
     },
     GridSample: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "grid", required: true },
@@ -1092,6 +1208,7 @@ export const KernelMetadata = {
         ],
     },
     Identity: {
+        category: NODE_CATEGORIES.Shape,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1099,6 +1216,7 @@ export const KernelMetadata = {
         args: [],
     },
     MoveDim: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1109,6 +1227,7 @@ export const KernelMetadata = {
         ],
     },
     Narrow: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "dim", required: true },
@@ -1119,6 +1238,7 @@ export const KernelMetadata = {
         args: [],
     },
     Pad: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "data", required: true },
             { index: 1, name: "pads", required: true },
@@ -1131,6 +1251,7 @@ export const KernelMetadata = {
         ],
     },
     Resize: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "scalesOrSizes", required: true },
@@ -1145,6 +1266,7 @@ export const KernelMetadata = {
         ],
     },
     Select: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "dim", required: true },
@@ -1154,6 +1276,7 @@ export const KernelMetadata = {
         args: [],
     },
     Slice: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "starts", required: true },
@@ -1165,6 +1288,7 @@ export const KernelMetadata = {
         args: [],
     },
     SliceSet: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "values", required: true },
@@ -1177,6 +1301,7 @@ export const KernelMetadata = {
         args: [],
     },
     SpaceToDepth: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1186,6 +1311,7 @@ export const KernelMetadata = {
         ],
     },
     Split: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "split", required: false },
@@ -1199,6 +1325,7 @@ export const KernelMetadata = {
         ],
     },
     Squeeze: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "axes", required: false },
@@ -1207,6 +1334,7 @@ export const KernelMetadata = {
         args: [],
     },
     Tile: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "repeats", required: true },
@@ -1215,6 +1343,7 @@ export const KernelMetadata = {
         args: [],
     },
     Transpose: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1224,6 +1353,7 @@ export const KernelMetadata = {
         ],
     },
     Trilu: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "k", required: false },
@@ -1234,6 +1364,7 @@ export const KernelMetadata = {
         ],
     },
     Unsqueeze: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
             { index: 1, name: "axes", required: true },
@@ -1242,6 +1373,7 @@ export const KernelMetadata = {
         args: [],
     },
     Acos: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1249,6 +1381,7 @@ export const KernelMetadata = {
         args: [],
     },
     Acosh: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1256,6 +1389,7 @@ export const KernelMetadata = {
         args: [],
     },
     Asin: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1263,6 +1397,7 @@ export const KernelMetadata = {
         args: [],
     },
     Asinh: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1270,6 +1405,7 @@ export const KernelMetadata = {
         args: [],
     },
     Atan: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1277,6 +1413,7 @@ export const KernelMetadata = {
         args: [],
     },
     Atanh: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1284,6 +1421,7 @@ export const KernelMetadata = {
         args: [],
     },
     Cos: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1291,6 +1429,7 @@ export const KernelMetadata = {
         args: [],
     },
     Cosh: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1298,6 +1437,7 @@ export const KernelMetadata = {
         args: [],
     },
     Sin: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1305,6 +1445,7 @@ export const KernelMetadata = {
         args: [],
     },
     Sinh: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1312,6 +1453,7 @@ export const KernelMetadata = {
         args: [],
     },
     Tan: {
+        category: NODE_CATEGORIES.Transform,
         inputs: [
             { index: 0, name: "input", required: true },
         ],
@@ -1319,6 +1461,7 @@ export const KernelMetadata = {
         args: [],
     },
     DequantizeUint8: {
+        category: NODE_CATEGORIES.Quantization,
         inputs: [
             { index: 0, name: "input", required: true },
         ],

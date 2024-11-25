@@ -1,4 +1,3 @@
-
 const grapher = {};
 
 grapher.Graph = class {
@@ -1051,3 +1050,25 @@ grapher.Edge.Path = class {
 };
 
 export const { Graph, Node, Edge, Argument } = grapher;
+
+export const NODE_CATEGORIES = Object.freeze({
+    // based on grapher.css
+    Layer: 'Layer', // Blue-ish
+    Wrapper: 'Wrapper', // White-ish
+    Activation: 'Activation', // Red-ish
+    Pool: 'Pool', // Green-ish
+    Normalization: 'Normalization', // Also green-ish
+    Dropout: 'Dropout', // Purple-blue-ish
+    Shape: 'Shape', // Brown-red-ish
+    Tensor: 'Tensor', // Brown-ish
+    Transform: 'Transform', // Green-ish
+    Data: 'Data', // Grey-ish
+    Quantization: 'Quantization', // Deep-brown-ish
+    Attention: 'Attention', // Orange-blue-ish
+    Custom: 'Custom', // Lighter-grey-ish
+
+    // things doesn't have it's own category, so uses transform
+    Math: 'Transform', // Add, Sub, Mul, Div
+    Logic: 'Transform', // And, Or, Xor, etc.
+    Random: 'Transform',
+});

@@ -3,6 +3,7 @@
 
 import { ByteBuffer } from './sentis-byte-buffer.js';
 import { KernelMetadata } from './sentis-kernel-metadata.js';
+import { NODE_CATEGORIES } from "./grapher.js";
 import { SentisFlatBuffer } from './sentis-schema.mjs';
 const { Program, Operator, KernelCall, Tensor, EValue, EDim, Int, Byte, InstructionArguments, KernelTypes } = SentisFlatBuffer;
 
@@ -249,7 +250,7 @@ sentis.Argument = class {
 
 sentis.Node = class {
     constructor(metadata, chain, executionPlan) {
-        this.type = { name: "Unknown" }; // Placeholder type
+        this.type = { name: "Default", type: "Unknown", category: NODE_CATEGORIES.Custom }; // Fallback
         this.inputs = processIO(executionPlan, 'input', chain);
         this.outputs = processIO(executionPlan, 'output', chain);
         this.attributes = [];
@@ -262,7 +263,7 @@ sentis.Node = class {
 
             const instrType = instruction.instrArgsType();
             if (instrType === InstructionArguments.NONE) {
-                this.attributes.push({ name: 'NoOp' });
+                this.attributes.push({ name: 'NoOp', type: NODE_CATEGORIES.Custom });
                 continue;
             }
 
@@ -283,9 +284,13 @@ sentis.Node = class {
             }
 
             const operatorName = operator.name();
+            const cat = KernelMetadata[operatorName].category;
+            const category = NODE_CATEGORIES[cat] ??  NODE_CATEGORIES.Custom;
+
+            console.log(operatorName, category);
 
             // Update node type
-            this.type = { name: operatorName ?? 'Unnamed Kernel' };
+            this.type = { name: operatorName ?? 'Unnamed Kernel', type: operatorName ?? 'Unknown Kernel Type', category };
 
             // Use parseKernel to get attributes
             const parsedAttributes = parseKernel(operatorName, kernelCall, chain, executionPlan);
