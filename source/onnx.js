@@ -890,9 +890,6 @@ onnx.Context.Model = class {
         this._functions = new Map();
         for (const func of functions || []) {
             const key = func.overload ? `${func.domain}:${func.name}:${func.overload}` : `${func.domain}:${func.name}`;
-            if (this._functions.has(key)) {
-                throw new onnx.Error(`Duplicate function identifier '${key}'.`);
-            }
             func.initializer = [];
             func.uses = [];
             func.callers = new Set();
