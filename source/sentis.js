@@ -197,10 +197,10 @@ sentis.ModelFactory = class {
         const reader = context.read('binary');
         const fileSize = getInt32([...reader._buffer.slice(0, 4)]);
         const rawBytes = new Uint8Array([...reader._buffer.slice(0, fileSize + 4)]);
-        const bb = new ByteBuffer(rawBytes, 4);
+        const bb = new ByteBuffer(rawBytes);
 
         // Parse the program using FlatBuffers
-        const program = Program.getRootAsProgram(bb);
+        const program = Program.getSizePrefixedRootAsProgram(bb);
         if (!program) {
             logError("No program!");
         }
