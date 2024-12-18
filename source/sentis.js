@@ -23,21 +23,25 @@ export const logWarning = (...args) => {
     /* eslint-enable no-console */
 };
 
-const listThing = (executionPlan, thing, accessorFunc = undefined) => {
-    const length = executionPlan[`${thing}Length`]?.() || 0;
+const sentis = {
+    executionPlan: undefined // defined in Graph, use only after it's defined, i.e. Node, etc.
+};
+
+const listThing = (thing, accessorFunc = undefined) => {
+    const length = sentis.executionPlan[`${thing}Length`]?.() || 0;
     const list = [];
     for (let i = 0; i < length; i++) {
-        const accessedThing = accessorFunc ? executionPlan[thing]?.(i)?.[accessorFunc]?.() : executionPlan[thing]?.(i);
+        const accessedThing = accessorFunc ? sentis.executionPlan[thing]?.(i)?.[accessorFunc]?.() : sentis.executionPlan[thing]?.(i);
         list.push(accessedThing);
     }
     return list.join(', ');
 };
 
-const listOperators = (executionPlan) => listThing(executionPlan, 'operators', 'name');
-const listInputsNames = (executionPlan) => listThing(executionPlan, 'inputsName');
-const listOutputsNames = (executionPlan) => listThing(executionPlan, 'outputsName');
+const listOperators = () => listThing('operators', 'name');
+const listInputsNames = () => listThing('inputsName');
+const listOutputsNames = () => listThing('outputsName');
 
-const debugExecutionPlan = (executionPlan) => {
+const debugExecutionPlan = () => {
     const optionalEncoding = undefined;
     const index = 0;
     const obj = undefined;
@@ -48,53 +52,51 @@ const debugExecutionPlan = (executionPlan) => {
         '===': 'Note: whenever an index is required, like the singular of a thing, 0 is used',
         executionPlan: {
             ...spacer,
-            name: executionPlan.name?.(optionalEncoding),
-            values: executionPlan.values?.(index, obj),
-            valuesLength: executionPlan.valuesLength?.(),
+            name: sentis.executionPlan.name?.(optionalEncoding),
+            values: sentis.executionPlan.values?.(index, obj),
+            valuesLength: sentis.executionPlan.valuesLength?.(),
         },
         inputs: {
-            '-derivedInputsNames': listInputsNames(executionPlan),
+            '-derivedInputsNames': listInputsNames(),
             ...spacer,
-            inputs: executionPlan.inputs?.(index),
-            inputsLength: executionPlan.inputsLength?.(),
-            inputsArray: executionPlan.inputsArray?.(),
-            inputsName: executionPlan.inputsName?.(index, optionalEncoding),
-            inputsNameLength: executionPlan.inputsNameLength?.(),
+            inputs: sentis.executionPlan.inputs?.(index),
+            inputsLength: sentis.executionPlan.inputsLength?.(),
+            inputsArray: sentis.executionPlan.inputsArray?.(),
+            inputsName: sentis.executionPlan.inputsName?.(index, optionalEncoding),
+            inputsNameLength: sentis.executionPlan.inputsNameLength?.(),
         },
         outputs: {
-            '-derivedInputsNames': listOutputsNames(executionPlan),
+            '-derivedInputsNames': listOutputsNames(),
             ...spacer,
-            outputs: executionPlan.outputs?.(index),
-            outputsLength: executionPlan.outputsLength?.(),
-            outputsArray: executionPlan.outputsArray?.(),
-            outputsName: executionPlan.outputsName?.(index, optionalEncoding),
-            outputsNameLength: executionPlan.outputsNameLength?.(),
+            outputs: sentis.executionPlan.outputs?.(index),
+            outputsLength: sentis.executionPlan.outputsLength?.(),
+            outputsArray: sentis.executionPlan.outputsArray?.(),
+            outputsName: sentis.executionPlan.outputsName?.(index, optionalEncoding),
+            outputsNameLength: sentis.executionPlan.outputsNameLength?.(),
         },
         chains: {
             '-firstChain': {
-                raw: executionPlan.chains?.(index, obj),
-                inputsArray: executionPlan.chains?.(index, obj)?.inputsArray(),
-                '-firstInstruction.instrArgs.operator': executionPlan.operators(
-                    executionPlan.chains?.(index, obj)?.instructions(0).instrArgs(new KernelCall()).opIndex()
+                raw: sentis.executionPlan.chains?.(index, obj),
+                inputsArray: sentis.executionPlan.chains?.(index, obj)?.inputsArray(),
+                '-firstInstruction.instrArgs.operator': sentis.executionPlan.operators(
+                    sentis.executionPlan.chains?.(index, obj)?.instructions(0).instrArgs(new KernelCall()).opIndex()
                 ).name()
             },
             ...spacer,
-            chains: executionPlan.chains?.(index, obj),
-            chainsLength: executionPlan.chainsLength?.(),
+            chains: sentis.executionPlan.chains?.(index, obj),
+            chainsLength: sentis.executionPlan.chainsLength?.(),
         },
         operators: {
-            '-derivedOperators': listOperators(executionPlan),
+            '-derivedOperators': listOperators(),
             ...spacer,
-            operators: executionPlan.operators?.(index),
-            length: executionPlan.operatorsLength?.(),
-            backendPartitioning: executionPlan.backendPartitioning?.(obj),
+            operators: sentis.executionPlan.operators?.(index),
+            length: sentis.executionPlan.operatorsLength?.(),
+            backendPartitioning: sentis.executionPlan.backendPartitioning?.(obj),
         },
-        rawExecutionPlan: executionPlan, // Add the raw object for reference if needed
+        rawExecutionPlan: sentis.executionPlan, // Add the raw object for reference if needed
     };
     logInfo('ExecutionPlan Debugging', logObject);
 };
-
-const sentis = {};
 
 const getInt32 = (buffer) => {
     return buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
@@ -103,7 +105,7 @@ const getInt32 = (buffer) => {
 const parseTensor = (val) => {
     console.log('logging Tensor', val);
     return null;
-}
+};
 
 const extractValueByType = (value, type) => {
     const valType = value.valType();
@@ -137,7 +139,7 @@ const extractValueByType = (value, type) => {
     }
 };
 
-const parseKernel = (kernelName, kernelCall, chain, executionPlan) => {
+const parseKernel = (kernelName, kernelCall, chain) => {
     const metadata = KernelMetadata[kernelName];
     if (!metadata) {
         logWarning(`Unsupported kernel: ${kernelName}`);
@@ -160,7 +162,7 @@ const parseKernel = (kernelName, kernelCall, chain, executionPlan) => {
     // Process arguments
     metadata.args.forEach(({ index, name, type }) => {
         const argIndex = kernelCall.args(index);
-        const value = executionPlan.values(argIndex, new EValue());
+        const value = sentis.executionPlan.values(argIndex, new EValue());
         if (value) {
             const argValue = extractValueByType(value, type);
             attributes.push({ name, value: argValue });
@@ -172,9 +174,9 @@ const parseKernel = (kernelName, kernelCall, chain, executionPlan) => {
     return attributes;
 };
 
-function processIO(executionPlan, type = 'input', chain = null) {
+function processIO(type = 'input', chain = null) {
 
-    const context = chain || executionPlan;
+    const context = chain || sentis.executionPlan;
     const accessorFuncName = `${type}s`;
     const lengthFuncName = `${type}sLength`;
     const nameFuncName = `${type}sName`;
@@ -182,7 +184,7 @@ function processIO(executionPlan, type = 'input', chain = null) {
     if (
         typeof context[lengthFuncName] !== 'function' ||
         typeof context[accessorFuncName] !== 'function' ||
-        typeof executionPlan[nameFuncName] !== 'function'
+        typeof sentis.executionPlan[nameFuncName] !== 'function'
     ) {
         throw new Error(`Invalid context: Missing methods '${lengthFuncName}', '${accessorFuncName}', or '${nameFuncName}'.`);
     }
@@ -195,11 +197,11 @@ function processIO(executionPlan, type = 'input', chain = null) {
     document.val = {};
     for (let i = 0; i < length; i++) {
         const index = accessorFunc(i);
-        const eValue = executionPlan.values(index, new EValue());
+        const eValue = sentis.executionPlan.values(index, new EValue());
         const valType = eValue?.valType();
         const valTypeStr = KernelTypes[valType] || "Unknown";
 
-        const name = executionPlan[nameFuncName](i, new TextDecoder('utf-8'));
+        const name = sentis.executionPlan[nameFuncName](i, new TextDecoder('utf-8'));
         const readableLabel = name || `${type}_${valTypeStr}_${index}`;
 
         if (valTypeStr === 'Tensor') {
@@ -298,22 +300,23 @@ sentis.Model = class {
 
 sentis.Graph = class {
     constructor(metadata, program) {
-        const executionPlan = program.executionPlan();
-        debugExecutionPlan(executionPlan);
-        if (!executionPlan) {
+        // this here sets executionPlan for the entire sentis file
+        sentis.executionPlan = program.executionPlan();
+        debugExecutionPlan();
+        if (!sentis.executionPlan) {
             logError("No execution plan!");
             return;
         }
 
         // Graph properties
         this.name = program.name || '';
-        this.inputs = processIO(executionPlan, 'input');
-        this.outputs = processIO(executionPlan, 'output');
+        this.inputs = processIO('input');
+        this.outputs = processIO('output');
         this.nodes = [];
 
-        for (let i = 0; i < executionPlan.chainsLength?.(); i++) {
-            const chain = executionPlan.chains?.(i);
-            this.nodes.push(new sentis.Node(metadata, chain, executionPlan, executionPlan.operators));
+        for (let i = 0; i < sentis.executionPlan.chainsLength?.(); i++) {
+            const chain = sentis.executionPlan.chains?.(i);
+            this.nodes.push(new sentis.Node(metadata, chain));
         }
     }
 };
@@ -327,25 +330,26 @@ sentis.Argument = class {
 };
 
 sentis.Node = class {
-    constructor(metadata, chain, executionPlan) {
+    constructor(metadata, chain) {
         this.type = { name: "Default", type: "Unknown", category: NODE_CATEGORIES.Custom }; // Fallback
-        this.inputs = processIO(executionPlan, 'input', chain);
-        this.outputs = processIO(executionPlan, 'output', chain);
+        this.inputs = processIO('input', chain);
+        this.outputs = processIO('output', chain);
         this.attributes = [];
 
         const kernelCalls = this.parseInstructions(chain);
 
         kernelCalls.forEach((kernelCall) => {
 
-            const { kernelName, category } = this.parseOperator(executionPlan, kernelCall);
+            const kernelName = this.nameKernel(kernelCall);
+            const category = this.categorizeKernel(kernelName);
 
             console.log(`Now debugging: ${kernelName} (${category})`);
 
-            // Update node type
+            // Update Node's type
             this.type = { name: kernelName, type: kernelName, category };
 
             // Use parseKernel to get attributes
-            const parsedAttributes = parseKernel(kernelName, kernelCall, chain, executionPlan);
+            const parsedAttributes = parseKernel(kernelName, kernelCall, chain);
 
             if (parsedAttributes) {
                 this.attributes.push(...parsedAttributes);
@@ -384,23 +388,15 @@ sentis.Node = class {
         }
         return kernelCalls;
     };
-
-    parseOperator = (executionPlan, kernelCall) => {
-
+    nameKernel = (kernelCall) => {
         const operatorIndex = kernelCall.opIndex();
-        if (!operatorIndex) {
-            logError("Invalid op index");
-        }
-
-        // Name the Kernel
-        const operator = operatorIndex && executionPlan.operators(operatorIndex, new Operator());
-        const operatorName = operator?.name?.() || "Unknown";
-
-        // Categorize
-        const kernelCategory = KernelMetadata[operatorName]?.category;
+        const operator = sentis.executionPlan.operators(operatorIndex, new Operator());
+        return operator.name();
+    };
+    categorizeKernel = (kernelName) => {
+        const kernelCategory = KernelMetadata[kernelName]?.category;
         const category = NODE_CATEGORIES[kernelCategory] ?? NODE_CATEGORIES.Custom;
-
-        return { kernelName: operatorName, category };
+        return category;
     };
 };
 
