@@ -56,6 +56,7 @@
         { "ext": "ptl",         "name": "PyTorch Model"            },
         { "ext": "rknn",        "name": "RKNN Model"               },
         { "ext": "safetensors", "name": "Safetensors Checkpoint"   },
+        { "ext": "sentis",      "name": "Sentis Runtime Model"     },
         { "ext": "t7",          "name": "Torch Model"              },
         { "ext": "tfl",         "name": "TensorFlow Lite Model"    },
         { "ext": "tflite",      "name": "TensorFlow Lite Model"    },
