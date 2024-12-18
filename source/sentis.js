@@ -23,49 +23,66 @@ export const logWarning = (...args) => {
     /* eslint-enable no-console */
 };
 
+const listThing = (executionPlan, thing, accessorFunc = undefined) => {
+    const length = executionPlan[`${thing}Length`]?.() || 0;
+    const list = [];
+    for (let i = 0; i < length; i++) {
+        const accessedThing = accessorFunc ? executionPlan[thing]?.(i)?.[accessorFunc]?.() : executionPlan[thing]?.(i);
+        list.push(accessedThing);
+    }
+    return list.join(', ');
+};
+
+const listOperators = (executionPlan) => listThing(executionPlan, 'operators', 'name');
+const listInputsNames = (executionPlan) => listThing(executionPlan, 'inputsName');
+const listOutputsNames = (executionPlan) => listThing(executionPlan, 'outputsName');
+
 const debugExecutionPlan = (executionPlan) => {
     const optionalEncoding = undefined;
     const index = 0;
     const obj = undefined;
-    console.log(`
-Execution Plan 
-(first index whenever an arg requires)
-===========
-    name = ${executionPlan.name?.(optionalEncoding)}
-    values = ${executionPlan.values?.(index, obj)}
-    valuesLength = ${executionPlan.valuesLength?.()}
 
-== Inputs ==
-    inputs = ${executionPlan.inputs?.(index)}
-    inputsLength = ${executionPlan.inputsLength?.()}
-    inputsArray = ${executionPlan.inputsArray?.()}
-    inputsName = ${executionPlan.inputsName?.(index, optionalEncoding)}
-    inputsNameLength = ${executionPlan.inputsNameLength?.()}
-
-== Outputs ==
-    outputs = ${executionPlan.outputs?.(index)}
-    outputsLength = ${executionPlan.outputsLength?.()}
-    outputsArray = ${executionPlan.outputsArray?.()}
-    outputsName = ${executionPlan.outputsName?.(index, optionalEncoding)}
-    outputsNameLength = ${executionPlan.outputsNameLength?.()}
-
-== Chains ==
-    chains = ${executionPlan.chains?.(index, obj)}
-    chainsLength = ${executionPlan.chainsLength?.()}
-
-== Operators ==
-    operators = ${executionPlan.operators?.(index, obj)}
-    operatorsLength = ${executionPlan.operatorsLength?.()}
-    backendPartitioning = ${executionPlan.backendPartitioning?.(obj)}
-
-Bellow the [object Object]s
-    `,
-    executionPlan.values?.(index, obj),
-    executionPlan.chains?.(index, obj),
-    executionPlan.operators?.(index, obj),
-    executionPlan.backendPartitioning?.(obj),
-    executionPlan,
-    );
+    // Interactive inspection in DevTools
+    const logObject = {
+        '===': 'Note: whenever an index is required, like the singular of a thing, 0 is used',
+        executionPlan: {
+            '===': 'These are directly on the execution plan',
+            name: executionPlan.name?.(optionalEncoding),
+            values: executionPlan.values?.(index, obj),
+            valuesLength: executionPlan.valuesLength?.(),
+        },
+        inputs: {
+            '-derivedInputsNames': listInputsNames(executionPlan),
+            '===': '', // separate derived from actual API
+            inputs: executionPlan.inputs?.(index),
+            inputsLength: executionPlan.inputsLength?.(),
+            inputsArray: executionPlan.inputsArray?.(),
+            inputsName: executionPlan.inputsName?.(index, optionalEncoding),
+            inputsNameLength: executionPlan.inputsNameLength?.(),
+        },
+        outputs: {
+            '-derivedInputsNames': listOutputsNames(executionPlan),
+            '===': '', // separate derived from actual API
+            outputs: executionPlan.outputs?.(index),
+            outputsLength: executionPlan.outputsLength?.(),
+            outputsArray: executionPlan.outputsArray?.(),
+            outputsName: executionPlan.outputsName?.(index, optionalEncoding),
+            outputsNameLength: executionPlan.outputsNameLength?.(),
+        },
+        chainsBundle: {
+            chains: executionPlan.chains?.(index, obj),
+            chainsLength: executionPlan.chainsLength?.(),
+        },
+        operators: {
+            '-derivedOperators': listOperators(executionPlan),
+            '===': '', // separate derived from actual API
+            operators: executionPlan.operators?.(index),
+            length: executionPlan.operatorsLength?.(),
+            backendPartitioning: executionPlan.backendPartitioning?.(obj),
+        },
+        rawExecutionPlan: executionPlan, // Add the raw object for reference if needed
+    };
+    logInfo('ExecutionPlan Debugging', logObject);
 };
 
 const sentis = {};
@@ -203,6 +220,9 @@ function processIO(executionPlan, type = 'input', chain = null) {
 
                 for (let i = 0; i < totalElements; i++) {
                     const value = parseValByType[scalarTypeStr]();
+                    if (value === null) {
+                        logWarning(`Didn't have a value parsed for Tensor with scalarType: ${scalarTypeStr}`);
+                    }
                     data.push(value);
                 }
                 logInfo('Decoded Tensor Data:', data);
