@@ -139,41 +139,6 @@ const extractValueByType = (value, type) => {
     }
 };
 
-const parseKernel = (kernelName, kernelCall, chain) => {
-    const metadata = KernelMetadata[kernelName];
-    if (!metadata) {
-        logWarning(`Unsupported kernel: ${kernelName}`);
-        return undefined;
-    }
-
-    const attributes = [];
-
-    // Process inputs
-    metadata.inputs.forEach(({ index, name, required }) => {
-        const inputIndex = required ? chain.inputs(index) : chain.inputs(index);
-        if (inputIndex !== undefined && inputIndex !== null) {
-            // const inputValue
-            attributes.push({ name, value: `Kernel MetaData Input ${inputIndex}` });
-        } else if (required) {
-            logError(`Missing required input: ${name}`);
-        }
-    });
-
-    // Process arguments
-    metadata.args.forEach(({ index, name, type }) => {
-        const argIndex = kernelCall.args(index);
-        const value = sentis.executionPlan.values(argIndex, new EValue());
-        if (value) {
-            const argValue = extractValueByType(value, type);
-            attributes.push({ name, value: argValue });
-        } else {
-            logWarning(`Missing argument: ${name}`);
-        }
-    });
-
-    return attributes;
-};
-
 function processIO(type = 'input', chain = null) {
 
     const context = chain || sentis.executionPlan;
@@ -349,7 +314,7 @@ sentis.Node = class {
             this.type = { name: kernelName, type: kernelName, category };
 
             // Use parseKernel to get attributes
-            const parsedAttributes = parseKernel(kernelName, kernelCall, chain);
+            const parsedAttributes = this.parseKernel(kernelName, kernelCall, chain);
 
             if (parsedAttributes) {
                 this.attributes.push(...parsedAttributes);
@@ -360,7 +325,7 @@ sentis.Node = class {
     }
 
     parseInstructions = (chain) => {
-        // for each inscruction parse attributes via operator name
+        // for each instruction parse attributes via operator name
         const kernelCalls = [];
         for (let i = 0; i < chain.instructionsLength(); i++) {
             const instruction = chain.instructions(i);
@@ -397,6 +362,42 @@ sentis.Node = class {
         const kernelCategory = KernelMetadata[kernelName]?.category;
         const category = NODE_CATEGORIES[kernelCategory] ?? NODE_CATEGORIES.Custom;
         return category;
+    };
+
+    parseKernel = (kernelName, kernelCall, chain) => {
+        // Do we know this Kernel?
+        const metadata = KernelMetadata[kernelName];
+        if (!metadata) {
+            logWarning(`Unsupported kernel: ${kernelName}`);
+            return undefined;
+        }
+
+        const attributes = [];
+
+        // Process inputs
+        metadata.inputs?.forEach(({ index, name, required }) => {
+            const inputIndex = required ? chain.inputs(index) : chain.inputs(index);
+            if (inputIndex !== undefined && inputIndex !== null) {
+                // const inputValue
+                attributes.push({ name, value: `Kernel MetaData Input ${inputIndex}` });
+            } else if (required) {
+                logError(`Missing required input: ${name}`);
+            }
+        });
+
+        // Process arguments
+        metadata.args?.forEach(({ index, name, type }) => {
+            const argIndex = kernelCall.args(index);
+            const value = sentis.executionPlan.values(argIndex, new EValue());
+            if (value) {
+                const argValue = extractValueByType(value, type);
+                attributes.push({ name, value: argValue });
+            } else {
+                logWarning(`Missing argument: ${name}`);
+            }
+        });
+
+        return attributes;
     };
 };
 
