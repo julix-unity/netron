@@ -5,7 +5,7 @@ import { ByteBuffer } from './sentis-byte-buffer.js';
 import { KernelMetadata } from './sentis-kernel-metadata.js';
 import { NODE_CATEGORIES } from "./grapher.js";
 import { SentisFlatBuffer } from './sentis-schema.mjs';
-const { Program, Operator, KernelCall, Tensor, EValue, EDim, Int, Byte, InstructionArguments, KernelTypes } = SentisFlatBuffer;
+const { Program, Operator, KernelCall, Tensor, EValue, EDim, Int, Byte, ScalarType, InstructionArguments, KernelTypes } = SentisFlatBuffer;
 
 export const logError = (...args) => {
     /* eslint-disable no-console */
@@ -158,15 +158,56 @@ function processIO(executionPlan, type = 'input', chain = null) {
 
     const length = lengthFunc();
     const result = [];
+    document.val = {};
     for (let i = 0; i < length; i++) {
         const index = accessorFunc(i);
-        const value = executionPlan.values(index, new EValue());
-        const valType = value?.valType();
+        const eValue = executionPlan.values(index, new EValue());
+        const valType = eValue?.valType();
         const valTypeStr = KernelTypes[valType] || "Unknown";
 
         const name = executionPlan[nameFuncName](i, new TextDecoder('utf-8'));
         const readableLabel = name || `${type}_${valTypeStr}_${index}`;
 
+        if (valTypeStr === 'Tensor') {
+            const val = eValue.val(new Tensor());
+            const valMeta = {
+                tensor: val,
+                name,
+                constantBufferIdx: val.constantBufferIdx(),
+                dynamicSizesLength: val.dynamicSizesLength(),
+                fixedSizesArray: val.fixedSizesArray(),
+                fixedSizesLength: val.fixedSizesLength(),
+                lengthByte: val.lengthByte(),
+                scalarType: val.scalarType(),
+                shapeDynamism: val.shapeDynamism(),
+                storageOffset: val.storageOffset(),
+                //val.dynamicSizes(index, obj),
+                // val.fixedSizes(index),
+            };
+            logInfo(valMeta);
+
+            const tensor = val;
+            if (tensor.storageOffset() && tensor.fixedSizesArray()) {
+                const shape = Array.from(tensor.fixedSizesArray());
+                const totalElements = shape.reduce((a, b) => a * b, 1);
+                const offset = tensor.storageOffset();
+                const scalarTypeStr = ScalarType[tensor.scalarType()]; // INT, FLOAT, etc.
+                const data = [];
+
+                const parseValByType = {
+                    INT: () => tensor.bb.readInt32(offset + i * 4), // int32
+                    FLOAT: () => tensor.bb.readFloat32(offset + i * 4), // float32
+                    BYTE: () => null, // don't know how to read it yet,
+                    SHORT: () => null, // don't know how to read it yet,
+                }
+
+                for (let i = 0; i < totalElements; i++) {
+                    const value = parseValByType[scalarTypeStr]();
+                    data.push(value);
+                }
+                logInfo('Decoded Tensor Data:', data);
+            }
+        }
         result.push(new sentis.Argument(readableLabel, [index]));
     }
     return result;
