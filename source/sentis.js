@@ -41,19 +41,20 @@ const debugExecutionPlan = (executionPlan) => {
     const optionalEncoding = undefined;
     const index = 0;
     const obj = undefined;
+    const spacer = {'===': ''}; // separate derived from actual API
 
     // Interactive inspection in DevTools
     const logObject = {
         '===': 'Note: whenever an index is required, like the singular of a thing, 0 is used',
         executionPlan: {
-            '===': 'These are directly on the execution plan',
+            ...spacer,
             name: executionPlan.name?.(optionalEncoding),
             values: executionPlan.values?.(index, obj),
             valuesLength: executionPlan.valuesLength?.(),
         },
         inputs: {
             '-derivedInputsNames': listInputsNames(executionPlan),
-            '===': '', // separate derived from actual API
+            ...spacer,
             inputs: executionPlan.inputs?.(index),
             inputsLength: executionPlan.inputsLength?.(),
             inputsArray: executionPlan.inputsArray?.(),
@@ -62,20 +63,28 @@ const debugExecutionPlan = (executionPlan) => {
         },
         outputs: {
             '-derivedInputsNames': listOutputsNames(executionPlan),
-            '===': '', // separate derived from actual API
+            ...spacer,
             outputs: executionPlan.outputs?.(index),
             outputsLength: executionPlan.outputsLength?.(),
             outputsArray: executionPlan.outputsArray?.(),
             outputsName: executionPlan.outputsName?.(index, optionalEncoding),
             outputsNameLength: executionPlan.outputsNameLength?.(),
         },
-        chainsBundle: {
+        chains: {
+            '-firstChain': {
+                raw: executionPlan.chains?.(index, obj),
+                inputsArray: executionPlan.chains?.(index, obj)?.inputsArray(),
+                '-firstInstruction.instrArgs.operator': executionPlan.operators(
+                    executionPlan.chains?.(index, obj)?.instructions(0).instrArgs(new KernelCall()).opIndex()
+                ).name()
+            },
+            ...spacer,
             chains: executionPlan.chains?.(index, obj),
             chainsLength: executionPlan.chainsLength?.(),
         },
         operators: {
             '-derivedOperators': listOperators(executionPlan),
-            '===': '', // separate derived from actual API
+            ...spacer,
             operators: executionPlan.operators?.(index),
             length: executionPlan.operatorsLength?.(),
             backendPartitioning: executionPlan.backendPartitioning?.(obj),
@@ -90,6 +99,11 @@ const sentis = {};
 const getInt32 = (buffer) => {
     return buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
 };
+
+const parseTensor = (val) => {
+    console.log('logging Tensor', val);
+    return null;
+}
 
 const extractValueByType = (value, type) => {
     const valType = value.valType();
@@ -115,16 +129,18 @@ const extractValueByType = (value, type) => {
             return Array.from(val.itemsArray()).map((item) => Boolean(item));
         case 'String':
             return val.stringVal();
+        case 'Tensor':
+            return parseTensor(val);
         default:
             logWarning(`Unsupported type: ${type}`);
             return null;
     }
 };
 
-const parseKernel = (operatorName, kernelCall, chain, executionPlan) => {
-    const metadata = KernelMetadata[operatorName];
+const parseKernel = (kernelName, kernelCall, chain, executionPlan) => {
+    const metadata = KernelMetadata[kernelName];
     if (!metadata) {
-        logWarning(`Unsupported kernel: ${operatorName}`);
+        logWarning(`Unsupported kernel: ${kernelName}`);
         return undefined;
     }
 
@@ -134,7 +150,8 @@ const parseKernel = (operatorName, kernelCall, chain, executionPlan) => {
     metadata.inputs.forEach(({ index, name, required }) => {
         const inputIndex = required ? chain.inputs(index) : chain.inputs(index);
         if (inputIndex !== undefined && inputIndex !== null) {
-            attributes.push({ name, value: `Input ${inputIndex}` });
+            // const inputValue
+            attributes.push({ name, value: `Kernel MetaData Input ${inputIndex}` });
         } else if (required) {
             logError(`Missing required input: ${name}`);
         }
@@ -316,6 +333,31 @@ sentis.Node = class {
         this.outputs = processIO(executionPlan, 'output', chain);
         this.attributes = [];
 
+        const kernelCalls = this.parseInstructions(chain);
+
+        kernelCalls.forEach((kernelCall) => {
+
+            const { kernelName, category } = this.parseOperator(executionPlan, kernelCall);
+
+            console.log(`Now debugging: ${kernelName} (${category})`);
+
+            // Update node type
+            this.type = { name: kernelName, type: kernelName, category };
+
+            // Use parseKernel to get attributes
+            const parsedAttributes = parseKernel(kernelName, kernelCall, chain, executionPlan);
+
+            if (parsedAttributes) {
+                this.attributes.push(...parsedAttributes);
+            } else {
+                logWarning(`Could not parse attributes for ${kernelName}`);
+            }
+        });
+    }
+
+    parseInstructions = (chain) => {
+        // for each inscruction parse attributes via operator name
+        const kernelCalls = [];
         for (let i = 0; i < chain.instructionsLength(); i++) {
             const instruction = chain.instructions(i);
             if (!instruction) {
@@ -323,46 +365,43 @@ sentis.Node = class {
             }
 
             const instrType = instruction.instrArgsType();
-            if (instrType === InstructionArguments.NONE) {
-                this.attributes.push({ name: 'NoOp', type: NODE_CATEGORIES.Custom });
+            const instrTypeStr = InstructionArguments[instrType];
+            if (instrTypeStr === "NONE") { // does happen
+                this.type.name = "No Op";
                 continue;
             }
 
-            if (instrType !== InstructionArguments.KernelCall) {
-                this.attributes.push({ name: 'UnknownInstruction', type: instrType });
+            if (instrTypeStr !== "KernelCall") { // this should never happen
+                logError(`Unknown instruction type: ${instrType}`);
                 continue;
             }
 
-            // Extract KernelCall arguments
             const kernelCall = instruction.instrArgs(new KernelCall());
-            const opIndex = kernelCall.opIndex();
-            const operator = executionPlan.operators(opIndex, new Operator());
 
-            if (!operator) {
-                logError(`Missing operator for opIndex ${opIndex}`);
-                this.attributes.push({ name: 'KernelCall', value: 'Unknown Kernel', opIndex });
-                continue;
-            }
+            kernelCalls.push(kernelCall);
+            continue;
 
-            const operatorName = operator.name();
-            const cat = KernelMetadata[operatorName].category;
-            const category = NODE_CATEGORIES[cat] ??  NODE_CATEGORIES.Custom;
-
-            console.log(operatorName, category);
-
-            // Update node type
-            this.type = { name: operatorName ?? 'Unnamed Kernel', type: operatorName ?? 'Unknown Kernel Type', category };
-
-            // Use parseKernel to get attributes
-            const parsedAttributes = parseKernel(operatorName, kernelCall, chain, executionPlan);
-
-            if (parsedAttributes) {
-                this.attributes.push(...parsedAttributes);
-            } else {
-                logWarning(`Could not parse kernel: ${operatorName}`);
-            }
         }
-    }
+        return kernelCalls;
+    };
+
+    parseOperator = (executionPlan, kernelCall) => {
+
+        const operatorIndex = kernelCall.opIndex();
+        if (!operatorIndex) {
+            logError("Invalid op index");
+        }
+
+        // Name the Kernel
+        const operator = operatorIndex && executionPlan.operators(operatorIndex, new Operator());
+        const operatorName = operator?.name?.() || "Unknown";
+
+        // Categorize
+        const kernelCategory = KernelMetadata[operatorName]?.category;
+        const category = NODE_CATEGORIES[kernelCategory] ?? NODE_CATEGORIES.Custom;
+
+        return { kernelName: operatorName, category };
+    };
 };
 
 sentis.Metadata = class {

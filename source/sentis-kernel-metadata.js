@@ -1472,6 +1472,7 @@ export const KernelMetadata = {
         ],
     },
     Gemm: { // was missing...
+        category: NODE_CATEGORIES.Custom,
         inputs: [
             { index: 0, name: "input", require: true },
             { index: 1, name: "bias" },
@@ -1480,5 +1481,5 @@ export const KernelMetadata = {
         ],
         outputs: [], // no idea
         args: [] // no idea
-    }
+    },
 };
