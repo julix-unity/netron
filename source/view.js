@@ -1853,7 +1853,7 @@ view.Graph = class extends grapher.Graph {
 
     add(graph, signature) {
         this.identifier = this.model.identifier;
-        this.identifier += graph && graph.name ? `.${graph.name.replace(/\/|\\/, '.')}` : '';
+        this.identifier += graph && graph.name ? `.${graph.name.replace(/\/|\\/g, '.')}` : '';
         const clusters = new Set();
         const clusterParentMap = new Map();
         const groups = graph.groups;
@@ -2081,7 +2081,7 @@ view.Node = class extends grapher.Node {
         title.on('click', () => {
             this.context.activate(value);
         });
-        if (Array.isArray(node.type.nodes) && node.type.nodes.length > 0) {
+        if (node.type.type || (Array.isArray(node.type.nodes) && node.type.nodes.length > 0)) {
             let icon = '\u0192';
             let tooltip = 'Show Function Definition';
             if (type === 'graph') {
@@ -2855,7 +2855,7 @@ view.TextView = class extends view.Control {
         super(context);
         this.element = this.createElement('div', 'sidebar-item-value');
         let className = 'sidebar-item-value-line';
-        if (value) {
+        if (value !== null && value !== undefined) {
             const list = Array.isArray(value) ? value : [value];
             for (const item of list) {
                 const line = this.createElement('div', className);
@@ -3016,7 +3016,8 @@ view.PrimitiveView = class extends view.Expander {
                     break;
                 }
                 default: {
-                    let content = new view.Formatter(value, type).toString();
+                    const formatter = new view.Formatter(value, type);
+                    let content = formatter.toString();
                     if (content && content.length > 1000) {
                         content = `${content.substring(0, 1000)}\u2026`;
                     }
@@ -3436,6 +3437,12 @@ view.ConnectionSidebar = class extends view.ObjectSidebar {
             this.addHeader('Outputs');
             this.addNodeList('to', to);
         }
+        if (Array.isArray(value.metadata) && value.metadata.length > 0) {
+            this.addHeader('Metadata');
+            for (const metadata of value.metadata) {
+                this.addProperty(metadata.name, metadata.value);
+            }
+        }
     }
 
     addNodeList(name, list) {
@@ -3634,6 +3641,13 @@ view.ModelSidebar = class extends view.ObjectSidebar {
                 this.addProperty(argument.name, argument.value);
             }
         }
+        const metrics = model.metrics;
+        if (Array.isArray(metrics) && metrics.length > 0) {
+            this.addHeader('Metrics');
+            for (const argument of metrics) {
+                this.addProperty(argument.name, argument.value);
+            }
+        }
         if (graph) {
             if (graph.version) {
                 this.addProperty('version', graph.version);
@@ -3665,6 +3679,13 @@ view.ModelSidebar = class extends view.ObjectSidebar {
             if (Array.isArray(metadata) && metadata.length > 0) {
                 this.addHeader('Metadata');
                 for (const argument of metadata) {
+                    this.addProperty(argument.name, argument.value);
+                }
+            }
+            const metrics = graph.metrics;
+            if (Array.isArray(metrics) && metrics.length > 0) {
+                this.addHeader('Metrics');
+                for (const argument of metrics) {
                     this.addProperty(argument.name, argument.value);
                 }
             }
@@ -4353,7 +4374,6 @@ view.Formatter = class {
     }
 
     _format(value, type, quote) {
-
         if (value && value.__class__ && value.__class__.__module__ === 'builtins' && value.__class__.__name__ === 'type') {
             return `${value.__module__}.${value.__name__}`;
         }
@@ -4445,7 +4465,8 @@ view.Formatter = class {
         }
         this._values.add(value);
         let list = null;
-        const entries = Object.entries(value).filter(([name]) => !name.startsWith('__') && !name.endsWith('__'));
+        const map = value instanceof Map ? Array.from(value) : Object.entries(value);
+        const entries = map.filter(([name]) => typeof name === 'string' && !name.startsWith('__') && !name.endsWith('__'));
         if (entries.length === 1) {
             list = [this._format(entries[0][1], null, true)];
         } else {
@@ -5699,7 +5720,7 @@ view.Context = class {
         return this._tags.get(type);
     }
 
-    metadata(name) {
+    async metadata(name) {
         return view.Metadata.open(this, name);
     }
 };
@@ -5755,10 +5776,11 @@ view.ModelFactoryService = class {
         this._host = host;
         this._patterns = new Set(['.zip', '.tar', '.tar.gz', '.tgz', '.gz']);
         this._factories = [];
+        /* eslint-disable no-control-regex */
         this.register('./message', ['.message', '.netron', '.maxviz']);
-        this.register('./pytorch', ['.pt', '.pth', '.ptl', '.pt1', '.pyt', '.pyth', '.pkl', '.pickle', '.h5', '.t7', '.model', '.dms', '.tar', '.ckpt', '.chkpt', '.tckpt', '.bin', '.pb', '.zip', '.nn', '.torchmodel', '.torchscript', '.pytorch', '.ot', '.params', '.trt', '.ff', '.ptmf', '.jit', '.pte', '.bin.index.json', 'model.json', 'serialized_exported_program.json', 'serialized_state_dict.json'], ['.model', '.pt2']);
-        this.register('./onnx', ['.onnx', '.onnx.data', '.onn', '.pb', '.onnxtxt', '.pbtxt', '.prototxt', '.txt', '.model', '.pt', '.pth', '.pkl', '.ort', '.ort.onnx', '.ngf', '.json', '.bin', 'onnxmodel']);
-        this.register('./tflite', ['.tflite', '.lite', '.tfl', '.bin', '.pb', '.tmfile', '.h5', '.model', '.json', '.txt', '.dat', '.nb', '.ckpt', '.onnx']);
+        this.register('./pytorch', ['.pt', '.pth', '.ptl', '.pt1', '.pyt', '.pyth', '.pkl', '.pickle', '.h5', '.t7', '.model', '.dms', '.tar', '.ckpt', '.chkpt', '.tckpt', '.bin', '.pb', '.zip', '.nn', '.torchmodel', '.torchscript', '.pytorch', '.ot', '.params', '.trt', '.ff', '.ptmf', '.jit', '.bin.index.json', 'model.json', '.ir', 'serialized_exported_program.json', 'serialized_state_dict.json'], ['.model', '.pt2']);
+        this.register('./onnx', ['.onnx', '.onnx.data', '.onn', '.pb', '.onnxtxt', '.pbtxt', '.prototxt', '.txt', '.model', '.pt', '.pth', '.pkl', '.ort', '.ort.onnx', '.ngf', '.json', '.bin', 'onnxmodel'], [], [/^....ORTM/]);
+        this.register('./tflite', ['.tflite', '.lite', '.tfl', '.bin', '.pb', '.tmfile', '.h5', '.model', '.json', '.txt', '.dat', '.nb', '.ckpt', '.onnx'], [], [/^....TFL3/]);
         this.register('./mxnet', ['.json', '.params'], ['.mar']);
         this.register('./coreml', ['.mlmodel', '.bin', 'manifest.json', 'metadata.json', 'featuredescriptions.json', '.pb', '.pbtxt', '.mil'], ['.mlpackage', '.mlmodelc']);
         this.register('./caffe', ['.caffemodel', '.pbtxt', '.prototxt', '.pt', '.txt']);
@@ -5766,8 +5788,8 @@ view.ModelFactoryService = class {
         this.register('./torch', ['.t7', '.net']);
         this.register('./tf', ['.pb', '.meta', '.pbtxt', '.prototxt', '.txt', '.pt', '.json', '.index', '.ckpt', '.graphdef', '.pbmm', /.data-[0-9][0-9][0-9][0-9][0-9]-of-[0-9][0-9][0-9][0-9][0-9]$/, /^events.out.tfevents./, /^.*group\d+-shard\d+of\d+(\.bin)?$/], ['.zip']);
         this.register('./tensorrt', ['.trt', '.trtmodel', '.engine', '.model', '.txt', '.uff', '.pb', '.tmfile', '.onnx', '.pth', '.dnn', '.plan', '.pt', '.dat', '.bin']);
-        this.register('./keras', ['.h5', '.hd5', '.hdf5', '.keras', '.json', '.cfg', '.model', '.pb', '.pth', '.weights', '.pkl', '.lite', '.tflite', '.ckpt', '.pb', 'model.weights.npz', /^.*group\d+-shard\d+of\d+(\.bin)?$/], ['.zip']);
-        this.register('./numpy', ['.npz', '.npy', '.pkl', '.pickle', '.model', '.model2', '.mge', '.joblib']);
+        this.register('./keras', ['.h5', '.hd5', '.hdf5', '.keras', '.json', '.cfg', '.model', '.pb', '.pth', '.weights', '.pkl', '.lite', '.tflite', '.ckpt', '.pb', 'model.weights.npz', /^.*group\d+-shard\d+of\d+(\.bin)?$/], ['.zip'], [/^\x89HDF\r\n\x1A\n/]);
+        this.register('./numpy', ['.npz', '.npy', '.pkl', '.pickle', '.model', '.model2', '.mge', '.joblib', '']);
         this.register('./lasagne', ['.pkl', '.pickle', '.joblib', '.model', '.pkl.z', '.joblib.z']);
         this.register('./lightgbm', ['.txt', '.pkl', '.model']);
         this.register('./sklearn', ['.pkl', '.pickle', '.joblib', '.model', '.meta', '.pb', '.pt', '.h5', '.pkl.z', '.joblib.z', '.pickle.dat', '.bin']);
@@ -5779,6 +5801,7 @@ view.ModelFactoryService = class {
         this.register('./bigdl', ['.model', '.bigdl']);
         this.register('./darknet', ['.cfg', '.model', '.txt', '.weights']);
         this.register('./mediapipe', ['.pbtxt']);
+        this.register('./executorch', ['.pte'], [], [/^....ET12/]);
         this.register('./rknn', ['.rknn', '.nb', '.onnx', '.json', '.bin', /^model$/]);
         this.register('./dlc', ['.dlc', /^model$/, '.params']);
         this.register('./armnn', ['.armnn', '.json']);
@@ -5786,10 +5809,10 @@ view.ModelFactoryService = class {
         this.register('./ncnn', ['.param', '.bin', '.cfg.ncnn', '.weights.ncnn', '.ncnnmodel']);
         this.register('./tnn', ['.tnnproto', '.tnnmodel']);
         this.register('./tengine', ['.tmfile']);
-        this.register('./mslite', ['.ms', '.bin']);
+        this.register('./mslite', ['.ms', '.bin'], [], [/^....MSL0/, /^....MSL1/, /^....MSL2/]);
         this.register('./barracuda', ['.nn']);
         this.register('./sentis', ['.sentis']);
-        this.register('./circle', ['.circle']);
+        this.register('./circle', ['.circle'], [], [/^....CIR0/]);
         this.register('./dnn', ['.dnn']);
         this.register('./xmodel', ['.xmodel']);
         this.register('./kmodel', ['.kmodel']);
@@ -5800,7 +5823,7 @@ view.ModelFactoryService = class {
         this.register('./acuity', ['.json']);
         this.register('./imgdnn', ['.dnn', 'params', '.json']);
         this.register('./flax', ['.msgpack']);
-        this.register('./om', ['.om', '.onnx', '.pb', '.engine', '.bin']);
+        this.register('./om', ['.om', '.onnx', '.pb', '.engine', '.bin'], [], [/^IMOD/, /^PICO/]);
         this.register('./gguf', ['.gguf', /^[^.]+$/]);
         this.register('./nnabla', ['.nntxt'], ['.nnp']);
         this.register('./hickle', ['.h5', '.hkl']);
@@ -5812,21 +5835,26 @@ view.ModelFactoryService = class {
         this.register('./hailo', ['.hn', '.har', '.metadata.json']);
         this.register('./nnc', ['.nnc','.tflite']);
         this.register('./safetensors', ['.safetensors', '.safetensors.index.json']);
-        this.register('./tvm', ['.json', '.params']);
-        this.register('./graphviz', ['.dot']);
+        this.register('./tvm', ['.json', '.dot', '.params']);
+        this.register('./dot', ['.do'], [], [/^\s*(\/\*[\s\S]*?\*\/|\/\/.*|#.*)?\s*digraph\s*([A-Za-z][A-Za-z0-9-_]*|".*?")?\s*{/m]);
         this.register('./catboost', ['.cbm']);
         this.register('./weka', ['.model']);
         this.register('./qnn', ['.json', '.bin', '.serialized']);
+        this.register('./kann', ['.kann', '.bin', '.kgraph']);
         this.register('', ['.cambricon', '.vnnmodel']);
+        /* eslint-enable no-control-regex */
     }
 
-    register(module, factories, containers) {
-        for (const pattern of factories) {
-            this._factories.push({ pattern, module });
-            this._patterns.add(pattern);
+    register(module, extensions, containers, contents) {
+        for (const extension of extensions) {
+            this._factories.push({ extension, module });
+            this._patterns.add(extension);
         }
-        for (const pattern of containers || []) {
-            this._patterns.add(pattern);
+        for (const content of contents || []) {
+            this._factories.push({ content, module });
+        }
+        for (const container of containers || []) {
+            this._patterns.add(container);
         }
     }
 
@@ -5921,6 +5949,7 @@ view.ModelFactoryService = class {
                     { name: 'Transformers generation configuration', tags: ['transformers_version'] },
                     { name: 'Transformers tokenizer configuration', tags: ['tokenizer_class'] },
                     { name: 'Transformers tokenizer configuration', tags: ['<|im_start|>'] },
+                    { name: 'Transformers tokenizer configuration', tags: ['bos_token', 'eos_token', 'unk_token'] },
                     { name: 'Transformers preprocessor configuration', tags: ['crop_size', 'do_center_crop', 'image_mean', 'image_std', 'do_resize'] },
                     { name: 'Tokenizers data', tags: ['version', 'added_tokens', 'model'] }, // https://github.com/huggingface/tokenizers/blob/main/tokenizers/src/tokenizer/serialization.rs
                     { name: 'Jupyter Notebook data', tags: ['cells', 'nbformat'] },
@@ -5958,7 +5987,10 @@ view.ModelFactoryService = class {
                 { name: 'StringIntLabelMapProto data', tags: ['item', 'item.id', 'item.name'] },
                 { name: 'caffe.LabelMap data', tags: ['item', 'item.name', 'item.label'] },
                 { name: 'Triton Inference Server configuration', tags: ['input', 'output', 'name', 'platform'] }, // https://github.com/triton-inference-server/common/blob/main/protobuf/model_config.proto
-                { name: 'Triton Inference Server configuration', tags: ['input', 'output', 'backend'] }, // https://github.com/triton-inference-server/common/blob/main/protobuf/model_config.proto
+                { name: 'Triton Inference Server configuration', tags: ['input', 'output', 'backend'] },
+                { name: 'Triton Inference Server configuration', tags: ['input', 'output', 'max_batch_size'] },
+                { name: 'Triton Inference Server configuration', tags: ['input', 'output', 'instance_group'] },
+                { name: 'Triton Inference Server configuration', tags: ['default_model_filename', 'max_batch_size'] },
                 { name: 'TensorFlow OpList data', tags: ['op', 'op.name', 'op.input_arg'] },
                 { name: 'vitis.ai.proto.DpuModelParamList data', tags: ['model', 'model.name', 'model.kernel'] },
                 { name: 'object_detection.protos.DetectionModel data', tags: ['model', 'model.ssd'] },
@@ -6061,6 +6093,7 @@ view.ModelFactoryService = class {
                     const formats = [
                         { name: 'ONNX Runtime model data', identifier: 'ORTM' },
                         { name: 'TensorFlow Lite model data', identifier: 'TFL3' },
+                        { name: 'ExecuTorch model data', identifier: 'ET12' },
                         { name: 'NNC model data', identifier: 'ENNC' },
                         { name: 'KaNN model data', identifier: 'KaNN' },
                         { name: 'Circle model data', identifier: 'CIR0' },
@@ -6256,7 +6289,9 @@ view.ModelFactoryService = class {
         identifier = identifier.toLowerCase().split('/').pop();
         let accept = false;
         for (const extension of this._patterns) {
-            if ((typeof extension === 'string' && identifier.endsWith(extension)) ||
+            if ((typeof extension === 'string' &&
+                    ((extension !== '' && identifier.endsWith(extension)) ||
+                     (extension === '' && identifier.indexOf('.') === -1))) ||
                 (extension instanceof RegExp && extension.exec(identifier))) {
                 accept = true;
                 break;
@@ -6272,10 +6307,17 @@ view.ModelFactoryService = class {
 
     _filter(context) {
         const identifier = context.identifier.toLowerCase().split('/').pop();
-        const list = this._factories.filter((entry) =>
-            (typeof entry.pattern === 'string' && identifier.endsWith(entry.pattern)) ||
-            (entry.pattern instanceof RegExp && entry.pattern.test(identifier)));
-        return Array.from(new Set(list.map((entry) => entry.module)));
+        const stream = context.stream;
+        if (stream) {
+            const buffer = stream.peek(Math.min(4096, stream.length));
+            const content = String.fromCharCode.apply(null, buffer);
+            const list = this._factories.filter((entry) =>
+                (typeof entry.extension === 'string' && identifier.endsWith(entry.extension)) ||
+                (entry.extension instanceof RegExp && entry.extension.test(identifier)) ||
+                (entry.content instanceof RegExp && entry.content.test(content)));
+            return Array.from(new Set(list.map((entry) => entry.module)));
+        }
+        return [];
     }
 
     async _openSignature(context) {

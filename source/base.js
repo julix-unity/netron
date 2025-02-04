@@ -1252,7 +1252,7 @@ base.Metadata = class {
 
     get extensions() {
         return [
-            'onnx', 'tflite', 'pb', 'pt', 'pt2', 'pth', 'h5', 'pbtxt', 'prototxt', 'caffemodel', 'mlmodel', 'mlpackage', 'sentis',
+            'onnx', 'tflite', 'pb', 'pt', 'pt2', 'pte', 'pth', 'h5', 'pbtxt', 'prototxt', 'caffemodel', 'mlmodel', 'mlpackage', 'sentis',
             'model', 'json', 'xml', 'cfg', 'weights', 'bin',
             'ort',
             'dnn', 'cmf',
@@ -1264,7 +1264,7 @@ base.Metadata = class {
             'paddle', 'pdiparams', 'pdmodel', 'pdopt', 'pdparams', 'nb',
             'pkl', 'pickle', 'joblib', 'safetensors',
             'ptl', 't7',
-            'dlc', 'uff', 'armnn',
+            'dlc', 'uff', 'armnn', 'kann', 'kgraph',
             'mnn', 'ms', 'ncnn', 'om', 'tm', 'mge', 'tmfile', 'tnnproto', 'xmodel', 'kmodel', 'rknn',
             'tar', 'zip'
         ];

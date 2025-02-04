@@ -29,6 +29,7 @@ om.Model = class {
 
     constructor(metadata, target) {
         this.format = target.format;
+        this.version = target.signature === 'PICO' ? target.model.version : '';
         const context = {
             metadata,
             signature: target.signature,
@@ -466,7 +467,7 @@ om.Container = class {
                     break;
                 }
                 case 'PICO': {
-                    this.format = 'DaVinci OM SVP'; // SVP = Smart Vision PICO
+                    this.format = 'DaVinci OM SVP'; // SVP = Smart Vision Platform
                     reader.uint32(); // reserved
                     this.size = reader.uint32();
                     const param_size = reader.uint32();
@@ -535,6 +536,7 @@ svp.ModelDef = class ModelDef {
         this.graph = [];
         this.name = reader.find(0x800D, 'string');
         this.batch_num = reader.find(0x600A);
+        this.version = '';
         while (reader.position < reader.length) {
             const tag = reader.uint16();
             const value = reader.value(tag);
@@ -606,6 +608,7 @@ svp.ModelDef = class ModelDef {
                 this.graph[0].op = this.graph[0].op.concat(this.graph[i].op);
             }
         }
+        this.version = this.graph[0].op.length === 0 ? 'release' : 'debug';
     }
 };
 
